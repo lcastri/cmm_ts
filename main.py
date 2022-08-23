@@ -10,7 +10,7 @@ from keras.losses import MeanSquaredError
 from keras.metrics import RootMeanSquaredError
 from keras.optimizers import Adam
 from keras.models import load_model
-from varname import nameof
+
 
 def df_to_X_y(df, window_size=5):
     df_as_np = df.to_numpy()
@@ -48,15 +48,13 @@ temp = df['T (degC)']
 
 # Defining train, validation, and test set
 WINDOW_SIZE = 5
+MODEL_NAME = "model"
 X_temp, y_temp = df_to_X_y(temp, WINDOW_SIZE)
 X_temp.shape, y_temp.shape
 
 TRAIN_PERC = 0.8
 VAL_PERC = 0.1
 TEST_PERC = 0.1
-TRAIN_LEN = len(X_temp) * TRAIN_PERC
-VAL_LEN = len(X_temp) * VAL_PERC
-TEST_LEN = len(X_temp) * TEST_PERC
 
 X_temp_train, X_temp_val, X_temp_test = get_sets(X_temp, TRAIN_PERC, VAL_PERC, TEST_PERC)
 y_temp_train, y_temp_val, y_temp_test = get_sets(y_temp, TRAIN_PERC, VAL_PERC, TEST_PERC)
@@ -71,13 +69,13 @@ model_temp.add(Dense(1, 'linear'))
 
 model_temp.summary()
 
-cp_temp = ModelCheckpoint(nameof(model_temp)+'/', save_best_only=True)
+cp_temp = ModelCheckpoint(MODEL_NAME + '/', save_best_only=True)
 model_temp.compile(loss=MeanSquaredError(), optimizer=Adam(learning_rate=0.0001), metrics=[RootMeanSquaredError()])
 model_temp.fit(X_temp_train, y_temp_train, validation_data=(X_temp_val, y_temp_val), epochs=10, callbacks=[cp_temp])
 
 
 # Load learned model
-model_temp = load_model(nameof(model_temp)+'/')
+model_temp = load_model(MODEL_NAME + '/')
 
 # Prediction on the train set
 train_predictions = model_temp.predict(X_temp_train).flatten()
