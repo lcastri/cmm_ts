@@ -1,5 +1,5 @@
+import os
 from keras.models import load_model
-import pandas as pd
 import matplotlib
 from matplotlib import pyplot as plt
 plt.style.use('ggplot')
@@ -7,71 +7,138 @@ matplotlib.use( 'tkagg' )
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 from parameters import *
+from Data import Data
 import numpy as np
+from keras.backend import clear_session
+from tqdm import tqdm
 
-def eval(X, actualY):
-    predictionY = model.predict(X)
-    rmse = list()
-    for b in range(len(predictionY)):
-        actualY[b,:,:] = scaler.inverse_transform(actualY[b,:,:])
-        predictionY[b,:,:] = scaler.inverse_transform(predictionY[b,:,:])
-        tmp_rmse = [sqrt(mean_squared_error(actualY[b,f,:], predictionY[b,f,:])) for f in range(N_FUTURE)]
-        rmse.append(tmp_rmse)
-    rmse = np.array(rmse)
-    rmse_mean = rmse.sum(axis=0)
-    rmse_mean = rmse_mean/len(rmse)
-    for i in range(len(rmse_mean)):
-        print('t+%d RMSE: %f' % ((i+1), rmse_mean[i]))
-    
-    plt.plot(range(N_FUTURE) , rmse_mean)
-    plt.title("RMSE prediction")
+
+def evaluate(X, actualY):
+    # Predict and invert scaling prediction
+    predY = model.predict(X)
+    rmse = np.zeros(shape = (1, actualY.shape[1]))
+    for t in tqdm(range(len(actualY))):
+        actualY_t = np.squeeze(actualY[t,:,:])
+        predY_t = np.squeeze(predY[t,:,:])
+        actualY_t = d.scaler.inverse_transform(actualY_t)
+        predY_t = d.scaler.inverse_transform(predY_t)
+        rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(N_FUTURE)])
+    rmse_mean = np.sum(rmse, axis=0)/len(actualY)
+    return rmse_mean
+
+
+def plot_rmse(list_rmse_mean, list_legends):
+    plt.figure()
+    plt.title("Mean RMSE vs time steps")
+    for i in range(len(list_rmse_mean)):
+        plt.plot(range(N_FUTURE), list_rmse_mean[i])
+    plt.xlabel("Time steps")
+    plt.xlabel("Mean RMSE")
+    plt.legend(list_legends)
     plt.show()
 
-def predict(X, actualY):
-    predictionY = model.predict(X)
 
-    gt = np.append(X, actualY, axis = 1)
-    prediction = np.append(X, predictionY, axis = 1)
+def plot_prediction(X, y, folder):
 
-    for b in range(len(prediction)):
-        gt[b,:,:] = scaler.inverse_transform(gt[b,:,:])
-        prediction[b,:,:] = scaler.inverse_transform(prediction[b,:,:])
+    # Create prediction folder
+    if not os.path.exists(folder + "predictions/"):
+        os.makedirs(folder + "predictions/")
 
-        df_prediction = pd.DataFrame(prediction[b,:,:], columns = df.columns.to_list())
-        df_actual = pd.DataFrame(gt[b,:,:], columns = df.columns.to_list())
-        print('RMSE')
-        for v in df.columns.to_list():
-            plt.plot(df_prediction[v])
-            plt.plot(df_actual[v])
-            plt.title(v + " prediction")
-            plt.legend(['Prediction', 'Actual'])
-            plt.show()
-            rmse = sqrt(mean_squared_error(df_actual[v], df_prediction[v]))
-            print('{:<10s}{:^5s}{:>10f}'.format(v, ":", rmse))
+    predY = model.predict(X)
+    for f in d.features:
+
+        # Create var folder
+        if not os.path.exists(folder + "predictions/" + str(f) + "/"):
+            os.makedirs(folder + "predictions/" + str(f) + "/")
+
+        f_idx = list(d.features).index(f)
+
+        # plt.figure()
+
+        for t in tqdm(range(len(predY))):
+            # test X
+            X_t = np.squeeze(X[t,:,:])
+            X_t = d.scaler.inverse_transform(X_t)
+
+            # test y
+            Y_t = np.squeeze(y[t,:,:])
+            Y_t = d.scaler.inverse_transform(Y_t)
+
+            # pred y
+            predY_t = np.squeeze(predY[t,:,:])
+            predY_t = d.scaler.inverse_transform(predY_t)
+
+            plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color='green')
+            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t[:, f_idx])), Y_t[:, f_idx], color='blue')
+            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t[:, f_idx])), predY_t[:, f_idx], color='red')
+            plt.title("Multi-step prediction - " + f)
+
+            # plt.draw()
+            plt.savefig(folder + "predictions/" + str(f) + "/" + str(t) + ".png")
+
+            plt.clf()
+
+
+
+def compare_causalW(mp, initial_causal_matrix):
+    layers = mp['layers']
+    ca_layers = [l for l in layers if l['class_name'] == "CausalAttention"]
+    ca_matrix = np.array([list(ca_layers[var]['config']['causal_attention_weights'].values()) for var in range(len(ca_layers))])
+    print(ca_matrix)
+    print(initial_causal_matrix)
+
+
+# Prepare timeseries
+d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC)
+d.downsample(10)
+d.scale_data()
+_, _, _, _, X_test, y_test = d.get_timeseries()
 
 
 # Load learned model
-model = load_model(MODEL_NAME + '/')
+model_folder = "model_F1sec_P2sec_noatt/"
+model = load_model(model_folder)
+# plot_prediction(X_test, y_test, model_folder)
+# model_params = model.get_config()
+# compare_causalW(model_params, CM_FPCMCI)
+# Evaluate predictions
+noatt_rmse_test = evaluate(X_test, y_test)
+clear_session()
 
-X, y = split_sequences(df_scaled, N_PAST, N_FUTURE)
-print ("X.shape" , X.shape) 
-print ("y.shape" , y.shape)
 
-trainX, valX, testX = get_sets(X, TRAIN_PERC, VAL_PERC, TEST_PERC)
-trainY, valY, testY = get_sets(y, TRAIN_PERC, VAL_PERC, TEST_PERC)
-print ("trainX.shape" , trainX.shape) 
-print ("trainy.shape" , trainY.shape)
-print ("valX.shape" , valX.shape) 
-print ("valy.shape" , valY.shape)
-print ("testX.shape" , testX.shape) 
-print ("testy.shape" , testY.shape)
+# Load learned model
+model_folder = "model_F1sec_P2sec_att/"
+model = load_model(model_folder)
+# plot_prediction(X_test, y_test, model_folder)
+# model_params = model.get_config()
+# compare_causalW(model_params, CM_FPCMCI)
+# Evaluate predictions
+att_rmse_test = evaluate(X_test, y_test)
+clear_session()
 
-# Predictions
-# predict(trainX, trainY)
-# predict(valX, valY)
-# predict(testX, testY)
 
-eval(trainX, trainY)
+# Load learned model
+model_folder = "model_F1sec_P2sec_catt_fixed/"
+model = load_model(model_folder)
+# plot_prediction(X_test, y_test, model_folder)
+# model_params = model.get_config()
+# compare_causalW(model_params, CM_FPCMCI)
+# Evaluate predictions
+catt_rmse_test = evaluate(X_test, y_test)
+clear_session()
+
+
+# Load learned model
+model_folder = "model_F1sec_P2sec_catt_trainable/"
+model = load_model(model_folder)
+# plot_prediction(X_test, y_test, model_folder)
+# model_params = model.get_config()
+# compare_causalW(model_params, CM_FPCMCI)
+# Evaluate predictions
+catttrain_rmse_test = evaluate(X_test, y_test)
+clear_session()
+
+plot_rmse(list_rmse_mean=[noatt_rmse_test, att_rmse_test, catt_rmse_test, catttrain_rmse_test], list_legends=["no-att", "att", "causal-att (fixed)","causal-att (train)"])
 
 
 
