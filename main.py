@@ -1,5 +1,4 @@
 from model.mIAED import mIAED
-from model.mIACNNED import mIACNNED
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from model.AdjLR import AdjLR
 from Data import Data
@@ -34,7 +33,6 @@ create_folder(MODEL_FOLDER + "/")
 
 # Model definition
 model = mIAED(config = config)
-# model = mIACNNED(config = config_2)
 model.compile(loss='mse', optimizer = Adam(0.0005), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
 model.model().summary()
 plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
