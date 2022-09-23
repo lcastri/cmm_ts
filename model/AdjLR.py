@@ -8,6 +8,7 @@ class AdjLR(keras.callbacks.Callback):
         self.factor =factor
         self.verbose=verbose
         self.adj_epoch=freq
+        
     def on_epoch_end(self, epoch, logs=None):
         if epoch + 1 == self.adj_epoch: # adjust the learning rate
             lr=float(tf.keras.backend.get_value(self.model.optimizer.lr)) # get the current learning rate
