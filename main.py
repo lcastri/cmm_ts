@@ -33,7 +33,7 @@ create_folder(MODEL_FOLDER + "/")
 
 # Model definition
 model = mIAED(config = config)
-model.compile(loss='mse', optimizer = Adam(0.0005), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
+model.compile(loss='mse', optimizer = Adam(0.00005), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
 model.model().summary()
 plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
 
@@ -41,9 +41,9 @@ plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shape
 # Model fit
 cb_earlystop = EarlyStopping(patience = 10)
 cb_checkpoints = ModelCheckpoint(MODEL_FOLDER + '/', save_best_only = True)
-cb_LR = AdjLR(model, 30, 0.2, 1)
+# cb_LR = AdjLR(model, 15, 0.1, 1)
 model.fit(x = X_train, y = y_train, validation_data = (X_val, y_val), batch_size = BATCH_SIZE, 
-          epochs = 200, callbacks = [cb_checkpoints, cb_earlystop, cb_LR])
+          epochs = 200, callbacks = [cb_checkpoints, cb_earlystop])
 
 # Model evaluation
 model.evaluate(x_test, y_test, BATCH_SIZE)
