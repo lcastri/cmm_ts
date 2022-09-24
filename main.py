@@ -33,7 +33,7 @@ create_folder(MODEL_FOLDER + "/")
 
 # Model definition
 model = mIAED(config = config)
-model.compile(loss='mse', optimizer = Adam(0.00005), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
+model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
 model.model().summary()
 plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
 

@@ -17,7 +17,7 @@ N_FEATURES = 8
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
-MODEL_FOLDER = "model_F100step_P200step_causal_train"
+MODEL_FOLDER = "model_F100step_P200step_causal_fixed"
 BATCH_SIZE = 128
 
 
@@ -57,38 +57,38 @@ config = {
     W_INPUTATT : {
         W_USECAUSAL : True,
         W_CMATRIX : CM_FPCMCI,
-        W_CTRAINABLE : True,
+        W_CTRAINABLE : False,
         W_USECONSTRAINT : False,
         W_TRAINTHRESH : 0.2
     },
 
     W_ENC : [
-        {W_UNITS : 128,
-         W_RSEQ : True,
-         W_RSTATE : True},
         {W_UNITS : 64,
-         W_RSEQ  : False,
-         W_RSTATE : True}
+         W_RSEQ : False,
+         W_RSTATE : True},
+        # {W_UNITS : 64,
+        #  W_RSEQ  : False,
+        #  W_RSTATE : True}
         ],
 
     W_DEC : [
-        {W_UNITS : 128,
-         W_RSEQ : True,
-         W_RSTATE : False},
         {W_UNITS : 64,
          W_RSEQ : True,
-         W_RSTATE : False}
+         W_RSTATE : False},
+        # {W_UNITS : 64,
+        #  W_RSEQ : True,
+        #  W_RSTATE : False}
         ],
 
     W_OUT : [
-        {W_UNITS : 256,
-         W_DROPOUT : 0.5,
-         W_ACT : "relu"},
-        {W_UNITS : 128,
-         W_DROPOUT : 0.5,
-         W_ACT : "relu"},
+        # {W_UNITS : 256,
+        #  W_DROPOUT : 0.5,
+        #  W_ACT : "relu"},
         {W_UNITS : 64,
-         W_DROPOUT : 0.5,
+         W_DROPOUT : None,
+         W_ACT : "relu"},
+        {W_UNITS : 32,
+         W_DROPOUT : None,
          W_ACT : "relu"}
     ]
 }
