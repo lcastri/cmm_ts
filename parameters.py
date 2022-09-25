@@ -18,7 +18,7 @@ TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
 MODEL_FOLDER = "model_F100step_P200step_catt_train"
-BATCH_SIZE = 128
+BATCH_SIZE = 256
 
 
 CM_PCMCI = np.array([[0.632,0.065,0.125,0.088,0.138,0.108,0.06,0.048], 
@@ -63,7 +63,7 @@ config = {
     },
 
     W_ENC : [
-        {W_UNITS : 64,
+        {W_UNITS : 128,
          W_RSEQ : False,
          W_RSTATE : True},
         # {W_UNITS : 64,
@@ -72,7 +72,7 @@ config = {
         ],
 
     W_DEC : [
-        {W_UNITS : 64,
+        {W_UNITS : 128,
          W_RSEQ : True,
          W_RSTATE : False},
         # {W_UNITS : 64,
@@ -84,10 +84,10 @@ config = {
         # {W_UNITS : 256,
         #  W_DROPOUT : 0.5,
         #  W_ACT : "relu"},
-        {W_UNITS : 64,
+        {W_UNITS : 128,
          W_DROPOUT : None,
          W_ACT : "relu"},
-        {W_UNITS : 32,
+        {W_UNITS : 64,
          W_DROPOUT : None,
          W_ACT : "relu"}
     ]
