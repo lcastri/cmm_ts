@@ -17,7 +17,7 @@ N_FEATURES = 8
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
-MODEL_FOLDER = "model_F100step_P200step_causal_fixed"
+MODEL_FOLDER = "model_F100step_P200step_noatt"
 BATCH_SIZE = 128
 
 
@@ -51,11 +51,11 @@ config = {
         W_NDELAY : N_DELAY,
         W_NFEATURES : N_FEATURES,
         W_FEATURES : features,
-        W_USEATT : True
+        W_USEATT : False
     },
 
     W_INPUTATT : {
-        W_USECAUSAL : True,
+        W_USECAUSAL : False,
         W_CMATRIX : CM_FPCMCI,
         W_CTRAINABLE : False,
         W_USECONSTRAINT : False,

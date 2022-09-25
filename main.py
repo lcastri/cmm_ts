@@ -31,6 +31,7 @@ X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 create_folder(MODEL_FOLDER + "/")
 
 
+
 # Model definition
 model = mIAED(config = config)
 model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)

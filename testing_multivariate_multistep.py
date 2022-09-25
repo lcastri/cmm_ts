@@ -96,7 +96,7 @@ _, _, _, _, X_test, y_test = d.get_timeseries()
 
 
 # Load learned model
-model_folder = "model_F1sec_P2sec_noatt/"
+model_folder = "model_F100step_P200step_noatt/"
 model = load_model(model_folder)
 # plot_prediction(X_test, y_test, model_folder)
 # model_params = model.get_config()
@@ -107,7 +107,7 @@ clear_session()
 
 
 # Load learned model
-model_folder = "model_F1sec_P2sec_att/"
+model_folder = "model_F100step_P200step_att/"
 model = load_model(model_folder)
 # plot_prediction(X_test, y_test, model_folder)
 # model_params = model.get_config()
@@ -118,7 +118,7 @@ clear_session()
 
 
 # Load learned model
-model_folder = "model_F1sec_P2sec_catt_fixed/"
+model_folder = "model_F100step_P200step_causal_fixed/"
 model = load_model(model_folder)
 # plot_prediction(X_test, y_test, model_folder)
 # model_params = model.get_config()
@@ -129,7 +129,7 @@ clear_session()
 
 
 # Load learned model
-model_folder = "model_F1sec_P2sec_catt_trainable/"
+model_folder = "model_F100step_P200step_causal_train/"
 model = load_model(model_folder)
 # plot_prediction(X_test, y_test, model_folder)
 # model_params = model.get_config()
