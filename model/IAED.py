@@ -5,9 +5,11 @@ from keras.models import *
 import tensorflow as tf
 from .TDenseDropout import TDenseDropout
 from .words import *
+from matplotlib import pyplot as plt
+import pickle
 
 
-class IAED(Layer):
+class IAED(Model):
     def __init__(self, config, target_var, name = "IAED"):
         super(IAED, self).__init__(name = name)
         self.config = config
@@ -72,15 +74,6 @@ class IAED(Layer):
             enc, h, c = self.encs[i](enc)
         self.past_h.assign(tf.expand_dims(h[0], -1))
         self.past_c.assign(tf.expand_dims(c[0], -1))
-        # for i in range(len(self.config[W_ENC])):
-        #     if i == 0:
-        #         enc = self.encs[i](x_tilde if self.config[W_SETTINGS][W_USEATT] else x)
-        #     elif 0 < i < len(self.config[W_ENC]) - 1:
-        #         enc = self.encs[i](enc)
-        #     else:
-        #         enc, h, c = self.encs[i](enc)
-        #         self.past_h.assign(tf.expand_dims(h[0], -1))
-        #         self.past_c.assign(tf.expand_dims(c[0], -1))
 
         repeat = self.repeat(enc)
             
@@ -96,6 +89,52 @@ class IAED(Layer):
 
         return y
 
+    def model(self):
+        x = Input(shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
+        return Model(inputs = [x], outputs = self.call(x))
+
+
+    def get_config(self):
+        data = dict()
+        if self.config[W_SETTINGS][W_USEATT] and self.config[W_INPUTATT][W_USECAUSAL]:
+            for var in self.config[W_SETTINGS][W_FEATURES]:
+                data[var] = self.ca.causal.numpy()
+        return {"causal_weights": data}
+
+
+    def fit(self, x=None, y=None, batch_size=None, epochs=1, verbose="auto", callbacks=None, validation_split=0, validation_data=None, shuffle=True, class_weight=None, sample_weight=None, initial_epoch=0, steps_per_epoch=None, validation_steps=None, validation_batch_size=None, validation_freq=1, max_queue_size=10, workers=1, use_multiprocessing=False):
+        history = super().fit(x, y, batch_size, epochs, verbose, callbacks, validation_split, validation_data, shuffle, class_weight, sample_weight, initial_epoch, steps_per_epoch, validation_steps, validation_batch_size, validation_freq, max_queue_size, workers, use_multiprocessing)
+        
+        plt.figure()
+        plt.plot(history.history["loss"], label = "Training loss")
+        plt.plot(history.history["val_loss"], label = "Validation loss")
+        plt.legend()
+        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/loss.png", dpi = 300)
+        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/loss.eps", dpi = 300)
+
+        plt.figure()
+        plt.plot(history.history["mae"], label = "Training mae")
+        plt.plot(history.history["val_mae"], label = "Validation mae")
+        plt.legend()
+        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mae.png", dpi = 300)
+        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mae.eps", dpi = 300)
+
+        plt.figure()
+        plt.plot(history.history["mape"], label = "Training mape")
+        plt.plot(history.history["val_mape"], label = "Validation mape")
+        plt.legend()
+        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mape.png", dpi = 300)
+        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mape.eps", dpi = 300)
+
+        plt.figure()
+        plt.plot(history.history["accuracy"], label = "Training accuracy")
+        plt.plot(history.history["val_accuracy"], label = "Validation accuracy")
+        plt.legend()
+        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/accuracy.png", dpi = 300)
+        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/accuracy.eps", dpi = 300)
+
+        with open(self.config[W_SETTINGS][W_FOLDER] + '/history', 'wb') as file_pi:
+            pickle.dump(history.history, file_pi)
 
     
               
