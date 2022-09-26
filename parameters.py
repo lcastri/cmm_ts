@@ -23,7 +23,7 @@ N_FEATURES = 8
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
-MODEL_FOLDER = "model_F100step_P200step_sT2V_noatt"
+MODEL_FOLDER = "sT2V_F100_P200_noatt"
 BATCH_SIZE = 128
 
 
@@ -47,7 +47,7 @@ CM_FPCMCI = np.array([[0.794693885975173,0.0797596212634794,0,0,0.20714749488419
                [0,0.0684969047836938,0.0634190046412317,0,0,0,0,0.972004088748988]])
 
 
-config = init_config(mCNNLSTM_config,
+config = init_config(sT2V_config,
                      folder = MODEL_FOLDER, 
                      npast = N_PAST,
                      nfuture = N_FUTURE,

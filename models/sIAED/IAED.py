@@ -7,7 +7,7 @@ from models.words import *
 from matplotlib import pyplot as plt
 import pickle
 import models.utils as utils
-import tqdm
+from tqdm import tqdm
 import numpy as np
 from math import sqrt
 from sklearn.metrics import mean_squared_error

@@ -53,7 +53,7 @@ X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 
 # T2VRNN Model definition
 model = T2VRNN(config = config, target_var = target_var)
-model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse'])#, 'mae', 'mape', 'accuracy'], run_eagerly = True)
+model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse'])#, 'mae', 'mape', 'accuracy'])
 model.model().summary()
 plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
 

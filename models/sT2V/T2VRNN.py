@@ -8,15 +8,14 @@ from models.Attention import CAttention
 import pickle
 from matplotlib import pyplot as plt
 import models.utils as utils
-
-import tqdm
+from tqdm import tqdm
 import numpy as np
 from math import sqrt
 from sklearn.metrics import mean_squared_error
 import os
 
 
-class T2VRNN(Model):
+class T2VRNN(Layer):
     
     def __init__(self, config, target_var, name = "T2VRNN"):
         super(T2VRNN, self).__init__(name = name)
@@ -93,26 +92,29 @@ class T2VRNN(Model):
         plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/loss.png", dpi = 300)
         plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/loss.eps", dpi = 300)
 
-        plt.figure()
-        plt.plot(history.history["mae"], label = "Training mae")
-        plt.plot(history.history["val_mae"], label = "Validation mae")
-        plt.legend()
-        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mae.png", dpi = 300)
-        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mae.eps", dpi = 300)
+        if "mae" in history.history.keys():
+            plt.figure()
+            plt.plot(history.history["mae"], label = "Training mae")
+            plt.plot(history.history["val_mae"], label = "Validation mae")
+            plt.legend()
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mae.png", dpi = 300)
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mae.eps", dpi = 300)
 
-        plt.figure()
-        plt.plot(history.history["mape"], label = "Training mape")
-        plt.plot(history.history["val_mape"], label = "Validation mape")
-        plt.legend()
-        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mape.png", dpi = 300)
-        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mape.eps", dpi = 300)
+        if "mape" in history.history.keys():
+            plt.figure()
+            plt.plot(history.history["mape"], label = "Training mape")
+            plt.plot(history.history["val_mape"], label = "Validation mape")
+            plt.legend()
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mape.png", dpi = 300)
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/mape.eps", dpi = 300)
 
-        plt.figure()
-        plt.plot(history.history["accuracy"], label = "Training accuracy")
-        plt.plot(history.history["val_accuracy"], label = "Validation accuracy")
-        plt.legend()
-        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/accuracy.png", dpi = 300)
-        plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/accuracy.eps", dpi = 300)
+        if "accuracy" in history.history.keys():
+            plt.figure()
+            plt.plot(history.history["accuracy"], label = "Training accuracy")
+            plt.plot(history.history["val_accuracy"], label = "Validation accuracy")
+            plt.legend()
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/accuracy.png", dpi = 300)
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/accuracy.eps", dpi = 300)
 
         with open(self.config[W_SETTINGS][W_FOLDER] + '/history', 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
@@ -133,12 +135,13 @@ class T2VRNN(Model):
         plt.title("Mean RMSE vs time steps")
         plt.plot(range(self.config[W_SETTINGS][W_NFUTURE]), rmse_mean)
         plt.xlabel("Time steps")
-        plt.xlabel("Mean RMSE")
+        plt.ylabel("Mean RMSE")
         if show:
             plt.show()
         else:
             plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/rmse_pred.png", dpi = 300)
             plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/rmse_pred.eps", dpi = 300)
+        plt.close()
         return rmse_mean
         
 
@@ -162,11 +165,11 @@ class T2VRNN(Model):
             X_t = scalerIN.inverse_transform(X_t)
 
             # test y
-            Y_t = np.squeeze(y[t,:,:])
+            Y_t = np.reshape(np.squeeze(y[t,:,:]), newshape = (len(np.squeeze(y[t,:,:])), 1))
             Y_t = scalerOUT.inverse_transform(Y_t)
 
             # pred y
-            predY_t = np.squeeze(predY[t,:,:])
+            predY_t = np.reshape(np.squeeze(predY[t,:]), newshape = (len(np.squeeze(predY[t,:])), 1))
             predY_t = scalerOUT.inverse_transform(predY_t)
 
             plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color = 'green', label = "past")

@@ -2,7 +2,7 @@ import os
 import logging
 import tensorflow as tf
 import absl.logging
-from words import *
+from .words import *
 
 def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, use_att = False, use_cm = False, cm = None, cm_trainable = False):
     config[W_SETTINGS][W_FOLDER] = folder

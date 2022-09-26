@@ -5,7 +5,7 @@ from .T2VRNN import T2VRNN
 from matplotlib import pyplot as plt
 from models.words import *
 import models.utils as utils
-import tqdm
+from tqdm import tqdm
 import numpy as np
 from math import sqrt
 from sklearn.metrics import mean_squared_error

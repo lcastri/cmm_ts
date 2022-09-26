@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 from models.words import *
 import models.utils as utils
 import numpy as np
-import tqdm
+from tqdm import tqdm
 from sklearn.metrics import mean_squared_error
 
 
