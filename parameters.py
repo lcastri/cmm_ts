@@ -3,7 +3,7 @@ import numpy as np
 from model.words import *
 
 # load csv and remove NaNs
-csv_path = "data/training/agent_11.csv"
+csv_path = "data/training/agent_11_aug.csv"
 df = pd.read_csv(csv_path)
 df.fillna(method="ffill", inplace = True)
 df.fillna(method="bfill", inplace = True)
@@ -17,7 +17,7 @@ N_FEATURES = 8
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
-MODEL_FOLDER = "model_F100step_P200step_catt_train"
+MODEL_FOLDER = "model_F100step_P200step_prova2"
 BATCH_SIZE = 256
 
 

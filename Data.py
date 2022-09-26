@@ -52,17 +52,6 @@ class Data():
         self.scalerOUT = self.scalerOUT.fit(out_seq)
         self.output_scaled = self.scalerOUT.transform(out_seq)
 
-    # def scale_input(self, seq):
-    #     seq = seq.astype(float)
-    #     self.scalerIN = MinMaxScaler()
-    #     self.scalerIN = self.scalerIN.fit(seq)
-    #     return self.scalerIN.transform(seq)
-
-    # def scale_output(self, seq):
-    #     seq = seq.astype(float)
-    #     self.scalerOUT = MinMaxScaler()
-    #     self.scalerOUT = self.scalerOUT.fit(seq)
-    #     return self.scalerOUT.transform(seq)
 
     def split_sequence(self):
         X, y = list(), list()

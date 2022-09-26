@@ -19,7 +19,7 @@ def evaluate(X, actualY):
     rmse = np.zeros(shape = (1, actualY.shape[1]))
     for t in tqdm(range(len(actualY))):
         actualY_t = np.reshape(np.squeeze(actualY[t,:,:]), newshape = (len(np.squeeze(actualY[t,:,:])), 1))
-        predY_t = np.reshape(np.squeeze(predY[t,:,:]), newshape = (len(np.squeeze(predY[t,:,:])), 1))
+        predY_t = np.reshape(np.squeeze(predY[t,:]), newshape = (len(np.squeeze(predY[t,:])), 1))
         actualY_t = d.scalerOUT.inverse_transform(actualY_t)
         predY_t = d.scalerOUT.inverse_transform(predY_t)
         rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(N_FUTURE)])
@@ -45,38 +45,36 @@ def plot_prediction(X, y, folder):
         os.makedirs(folder + "predictions/")
 
     predY = model.predict(X)
-    for f in d.features:
 
-        # Create var folder
-        if not os.path.exists(folder + "predictions/" + str(f) + "/"):
-            os.makedirs(folder + "predictions/" + str(f) + "/")
+    f = 'd_g'
+    f_idx = list(d.features).index(f)
+    # Create var folder
+    if not os.path.exists(folder + "predictions/" + str(f) + "/"):
+        os.makedirs(folder + "predictions/" + str(f) + "/")
 
-        f_idx = list(d.features).index(f)
 
-        # plt.figure()
+    for t in tqdm(range(len(predY))):
+        # test X
+        X_t = np.squeeze(X[t,:,:])
+        X_t = d.scalerIN.inverse_transform(X_t)
 
-        for t in tqdm(range(len(predY))):
-            # test X
-            X_t = np.squeeze(X[t,:,:])
-            X_t = d.scalerIN.inverse_transform(X_t)
+        # test y
+        Y_t = np.reshape(np.squeeze(y[t,:,:]), newshape = (len(np.squeeze(y[t,:,:])), 1))
+        Y_t = d.scalerOUT.inverse_transform(Y_t)
 
-            # test y
-            Y_t = np.squeeze(y[t,:,:])
-            Y_t = d.scalerOUT.inverse_transform(Y_t)
+        # pred y
+        predY_t = np.reshape(np.squeeze(predY[t,:]), newshape = (len(np.squeeze(predY[t,:])), 1))
+        predY_t = d.scalerOUT.inverse_transform(predY_t)
 
-            # pred y
-            predY_t = np.squeeze(predY[t,:,:])
-            predY_t = d.scalerOUT.inverse_transform(predY_t)
+        plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color='green')
+        plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t[:, f_idx])), Y_t[:, f_idx], color='blue')
+        plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t[:, f_idx])), predY_t[:, f_idx], color='red')
+        plt.title("Multi-step prediction - " + f)
 
-            plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color='green')
-            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t[:, f_idx])), Y_t[:, f_idx], color='blue')
-            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t[:, f_idx])), predY_t[:, f_idx], color='red')
-            plt.title("Multi-step prediction - " + f)
+        # plt.draw()
+        plt.savefig(folder + "predictions/" + str(f) + "/" + str(t) + ".png")
 
-            # plt.draw()
-            plt.savefig(folder + "predictions/" + str(f) + "/" + str(t) + ".png")
-
-            plt.clf()
+        plt.clf()
 
 
 
@@ -95,9 +93,9 @@ _, _, _, _, X_test, y_test = d.get_timeseries('d_g')
 
 
 # Load learned model
-model_folder = "model_F100step_P200step_noatt/"
+model_folder = "model_F100step_P200step_prova2/"
 model = load_model(model_folder)
-# plot_prediction(X_test, y_test, model_folder)
+plot_prediction(X_test, y_test, model_folder)
 # model_params = model.get_config()
 # compare_causalW(model_params, CM_FPCMCI)
 # Evaluate predictions
@@ -105,17 +103,17 @@ noatt_rmse_test = evaluate(X_test, y_test)
 clear_session()
 
 
-# Load learned model
-model_folder = "model_F100step_P200step_catt_train/"
-model = load_model(model_folder)
-# plot_prediction(X_test, y_test, model_folder)
-# model_params = model.get_config()
-# compare_causalW(model_params, CM_FPCMCI)
-# Evaluate predictions
-catttrain_rmse_test = evaluate(X_test, y_test)
-clear_session()
+# # Load learned model
+# model_folder = "model_F100step_P200step_catt_train/"
+# model = load_model(model_folder)
+# # plot_prediction(X_test, y_test, model_folder)
+# # model_params = model.get_config()
+# # compare_causalW(model_params, CM_FPCMCI)
+# # Evaluate predictions
+# catttrain_rmse_test = evaluate(X_test, y_test)
+# clear_session()
 
-plot_rmse(list_rmse_mean=[noatt_rmse_test, catttrain_rmse_test], list_legends=["no-att", "causal-att (train)"])
+plot_rmse(list_rmse_mean=[noatt_rmse_test], list_legends=["prova"])
 
 
 
