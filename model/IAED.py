@@ -4,7 +4,7 @@ from keras.layers import *
 from keras.models import *
 import tensorflow as tf
 from .TDenseDropout import TDenseDropout
-from .words import *
+from ..words import *
 from matplotlib import pyplot as plt
 import pickle
 

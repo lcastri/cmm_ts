@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from model.words import *
+from words import *
 
 # load csv and remove NaNs
 csv_path = "data/training/agent_11_aug.csv"
@@ -17,8 +17,8 @@ N_FEATURES = 8
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
-MODEL_FOLDER = "model_F100step_P200step_prova2"
-BATCH_SIZE = 256
+MODEL_FOLDER = "model_F100step_P200step_multiT2V"
+BATCH_SIZE = 128
 
 
 CM_PCMCI = np.array([[0.632,0.065,0.125,0.088,0.138,0.108,0.06,0.048], 
@@ -51,13 +51,13 @@ config = {
         W_NDELAY : N_DELAY,
         W_NFEATURES : N_FEATURES,
         W_FEATURES : features,
-        W_USEATT : True
+        W_USEATT : False
     },
 
     W_INPUTATT : {
-        W_USECAUSAL : True,
+        W_USECAUSAL : False,
         W_CMATRIX : CM_FPCMCI,
-        W_CTRAINABLE : True,
+        W_CTRAINABLE : False,
         W_USECONSTRAINT : False,
         W_TRAINTHRESH : 0.2
     },
@@ -90,5 +90,45 @@ config = {
         {W_UNITS : 64,
          W_DROPOUT : None,
          W_ACT : "relu"}
+    ]
+}
+
+
+config = {
+
+    W_SETTINGS : {
+        W_FOLDER : MODEL_FOLDER,
+        W_NPAST : N_PAST,
+        W_NFUTURE : N_FUTURE,
+        W_NDELAY : N_DELAY,
+        W_NFEATURES : N_FEATURES,
+        W_FEATURES : features,
+        W_USEATT : False
+    },
+
+    W_INPUTATT : {
+        W_USECAUSAL : False,
+        W_CMATRIX : CM_FPCMCI,
+        W_CTRAINABLE : False,
+        W_USECONSTRAINT : False,
+        W_TRAINTHRESH : 0.2
+    },
+
+    W_T2V : {
+        W_UNITS : 64
+    },
+
+    W_RNN : {
+        W_UNITS : 128
+    },
+    
+    W_OUT : [
+        # {W_UNITS : 256,
+        #  W_DROPOUT : 0.5,
+        #  W_ACT : "relu"},
+        {W_UNITS : 32,
+         W_ACT : "relu"},
+        # {W_UNITS : 64,
+        #  W_ACT : "relu"}
     ]
 }

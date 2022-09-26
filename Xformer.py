@@ -66,10 +66,7 @@ def T2V_NN(param):
     inp = Input(shape = (N_PAST, N_FEATURES))
     x = T2V(param['t2v_dim'])(inp)
     x = LSTM(param['LSTMunit'], activation = param['LSTMact'])(x)
-    # x = RepeatVector(N_FUTURE)(x)
-    # x = LSTM(param['LSTMunit'], return_sequences = True, activation = param['LSTMact'])(x)
-    # x = TimeDistributed(Dense(param['Dunit'], activation = param['Dact']))(x)
-    x = Dense(256, activation = 'relu')(x)
+    x = Dense(param['Dunit'], activation = param['Dact'])(x)
     x = Dense(N_FUTURE, activation = 'linear')(x)
     
     m = Model(inp, x)
@@ -88,19 +85,19 @@ create_folder(MODEL_FOLDER + "/")
 
 param_grid = {
     'LSTMunit': [128, 64, 32],
-    # 'Dunit': [128, 64, 32],
+    'Dunit': [256, 128, 64, 32],
     't2v_dim': [128, 64, 16],
     'lr': [1e-3, 1e-4, 1e-5], 
     'LSTMact': ['tanh'], 
-    # 'Dact': ['linear', 'relu'], 
+    'Dact': ['linear', 'relu'], 
     'epochs': 50,
-    'batch_size': [128, 256]
+    'batch_size': [128, 256, 512]
 }
 
 hypermodel = lambda x: T2V_NN(param = x)
 
 # kgs_t2v = KerasGridSearch(hypermodel, param_grid, monitor='val_loss', greater_is_better = False, tuner_verbose = 1)
-# kgs_t2v.search(X_train, y_train, validation_data = (X_val, y_val), shuffle = False)
+# best_param = kgs_t2v.search(X_train, y_train, validation_data = (X_val, y_val), shuffle = False)['best_params']
 best_param = {
     'LSTMunit': 128,
     'Dunit': 32,
@@ -111,7 +108,7 @@ best_param = {
     'epochs': 200,
     'batch_size': 128
 }
-model = T2V_NN(param=best_param)
+model = T2V_NN(param = best_param)
 model.summary()
 cb_earlystop = EarlyStopping(patience = 10)
 cb_checkpoints = ModelCheckpoint(MODEL_FOLDER + '/', save_best_only = True)

@@ -1,3 +1,4 @@
+from cProfile import label
 import os
 from keras.models import load_model
 import matplotlib
@@ -45,37 +46,76 @@ def plot_prediction(X, y, folder):
         os.makedirs(folder + "predictions/")
 
     predY = model.predict(X)
+    for f in d.features:
 
-    f = 'd_g'
-    f_idx = list(d.features).index(f)
-    # Create var folder
-    if not os.path.exists(folder + "predictions/" + str(f) + "/"):
-        os.makedirs(folder + "predictions/" + str(f) + "/")
+        # Create var folder
+        if not os.path.exists(folder + "predictions/" + str(f) + "/"):
+            os.makedirs(folder + "predictions/" + str(f) + "/")
+
+        f_idx = list(d.features).index(f)
+
+        for t in tqdm(range(len(predY))):
+            # test X
+            X_t = np.squeeze(X[t,:,:])
+            X_t = d.scaler.inverse_transform(X_t)
+
+            # test y
+            Y_t = np.squeeze(y[t,:,:])
+            Y_t = d.scaler.inverse_transform(Y_t)
+
+            # pred y
+            predY_t = np.squeeze(predY[t,:,:])
+            predY_t = d.scaler.inverse_transform(predY_t)
+
+            plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color = 'green', label = "past")
+            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t[:, f_idx])), Y_t[:, f_idx], color = 'blue', label = "actual")
+            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t[:, f_idx])), predY_t[:, f_idx], color = 'red', label = "pred")
+            plt.title("Multi-step prediction - " + f)
+            plt.xlabel("time []")
+            plt.ylabel(f)
+            plt.legend()
+            plt.savefig(folder + "predictions/" + str(f) + "/" + str(t) + ".png")
+
+            plt.clf()
+            
+    plt.close()
+
+# def plot_prediction(X, y, folder):
+#     # Create prediction folder
+#     if not os.path.exists(folder + "predictions/"):
+#         os.makedirs(folder + "predictions/")
+
+#     predY = model.predict(X)
+
+#     f = 'd_g'
+#     f_idx = list(d.features).index(f)
+#     # Create var folder
+#     if not os.path.exists(folder + "predictions/" + str(f) + "/"):
+#         os.makedirs(folder + "predictions/" + str(f) + "/")
 
 
-    for t in tqdm(range(len(predY))):
-        # test X
-        X_t = np.squeeze(X[t,:,:])
-        X_t = d.scalerIN.inverse_transform(X_t)
+#     for t in tqdm(range(len(predY))):
+#         # test X
+#         X_t = np.squeeze(X[t,:,:])
+#         X_t = d.scalerIN.inverse_transform(X_t)
 
-        # test y
-        Y_t = np.reshape(np.squeeze(y[t,:,:]), newshape = (len(np.squeeze(y[t,:,:])), 1))
-        Y_t = d.scalerOUT.inverse_transform(Y_t)
+#         # test y
+#         Y_t = np.reshape(np.squeeze(y[t,:,:]), newshape = (len(np.squeeze(y[t,:,:])), 1))
+#         Y_t = d.scalerOUT.inverse_transform(Y_t)
 
-        # pred y
-        predY_t = np.reshape(np.squeeze(predY[t,:]), newshape = (len(np.squeeze(predY[t,:])), 1))
-        predY_t = d.scalerOUT.inverse_transform(predY_t)
+#         # pred y
+#         predY_t = np.reshape(np.squeeze(predY[t,:]), newshape = (len(np.squeeze(predY[t,:])), 1))
+#         predY_t = d.scalerOUT.inverse_transform(predY_t)
 
-        plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color='green')
-        plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t[:, f_idx])), Y_t[:, f_idx], color='blue')
-        plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t[:, f_idx])), predY_t[:, f_idx], color='red')
-        plt.title("Multi-step prediction - " + f)
+#         plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color='green')
+#         plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t[:, f_idx])), Y_t[:, f_idx], color='blue')
+#         plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t[:, f_idx])), predY_t[:, f_idx], color='red')
+#         plt.title("Multi-step prediction - " + f)
 
-        # plt.draw()
-        plt.savefig(folder + "predictions/" + str(f) + "/" + str(t) + ".png")
+#         # plt.draw()
+#         plt.savefig(folder + "predictions/" + str(f) + "/" + str(t) + ".png")
 
-        plt.clf()
-
+#         plt.clf()
 
 
 def compare_causalW(mp, initial_causal_matrix):

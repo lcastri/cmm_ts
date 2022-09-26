@@ -17,6 +17,8 @@ W_USECONSTRAINT = "use_causalconstraint"
 W_TRAINTHRESH = "causalconstraint_threshold"
 
 # Layers
+W_T2V = "time2vect"
+W_RNN = "rnn"
 W_ENC = "enc_layers"
 W_DEC = "dec_layers"
 W_UNITS = "units"

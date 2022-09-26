@@ -3,7 +3,7 @@ import keras.backend as K
 import numpy as np
 from keras.layers import *
 from .Constraint import Between
-from ..words import *
+from words import *
 
 
 class CAttention(Layer):
