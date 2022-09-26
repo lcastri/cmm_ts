@@ -1,12 +1,17 @@
 import numpy as np
-from .Attention import CAttention
+from models.Attention import CAttention
 from keras.layers import *
 from keras.models import *
 import tensorflow as tf
-from .TDenseDropout import TDenseDropout
-from ..words import *
+from models.words import *
 from matplotlib import pyplot as plt
 import pickle
+import models.utils as utils
+import tqdm
+import numpy as np
+from math import sqrt
+from sklearn.metrics import mean_squared_error
+import os
 
 
 class IAED(Model):
@@ -14,6 +19,9 @@ class IAED(Model):
         super(IAED, self).__init__(name = name)
         self.config = config
         self.target_var = target_var
+
+        utils.create_folder(self.config[W_SETTINGS][W_FOLDER])
+        utils.no_warning()
 
         # Input attention
         if self.config[W_SETTINGS][W_USEATT]:
@@ -45,14 +53,12 @@ class IAED(Model):
                                   name = self.target_var + '_DEC',
                                   return_sequences = self.config[W_DEC][i][W_RSEQ]))
 
-        # Time distributed dense
+        # Dense
         self.outdense = list()
         for i in range(len(self.config[W_OUT])):
-            self.outdense.append(TDenseDropout(self.config[W_OUT][i][W_UNITS], 
-                                               dropout = self.config[W_OUT][i][W_DROPOUT],
-                                               activation = self.config[W_OUT][i][W_ACT], 
-                                               name = self.target_var + '_TDD'))
-        self.out = TimeDistributed(Dense(1, activation='linear'), name = self.target_var + '_out')
+            self.outdense.append(Dense(self.config[W_OUT][i][W_UNITS], activation = self.config[W_OUT][i][W_ACT], 
+                                       name = self.target_var + '_D'))
+        self.out = Dense(self.config[W_SETTINGS][W_NFUTURE], activation = 'linear', name = self.target_var + '_out')
 
         # Initialization
         self.past_h = tf.Variable(tf.zeros([self.config[W_ENC][-1][W_UNITS], 1]), 
@@ -88,6 +94,7 @@ class IAED(Model):
         y = self.out(y)
 
         return y
+        
 
     def model(self):
         x = Input(shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
@@ -137,4 +144,66 @@ class IAED(Model):
             pickle.dump(history.history, file_pi)
 
     
-              
+    def RMSE(self, X, y, scalerOUT, show = False):
+        predY = self.predict(X)
+        rmse = np.zeros(shape = (1, y.shape[1]))
+        for t in tqdm(range(len(y))):
+            actualY_t = np.reshape(np.squeeze(y[t,:,:]), newshape = (len(np.squeeze(y[t,:,:])), 1))
+            predY_t = np.reshape(np.squeeze(predY[t,:]), newshape = (len(np.squeeze(predY[t,:])), 1))
+            actualY_t = scalerOUT.inverse_transform(actualY_t)
+            predY_t = scalerOUT.inverse_transform(predY_t)
+            rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W_SETTINGS][W_NFUTURE])])
+        rmse_mean = np.sum(rmse, axis=0)/len(y)
+
+        plt.figure()
+        plt.title("Mean RMSE vs time steps")
+        plt.plot(range(self.config[W_SETTINGS][W_NFUTURE]), rmse_mean)
+        plt.xlabel("Time steps")
+        plt.xlabel("Mean RMSE")
+        if show:
+            plt.show()
+        else:
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/rmse_pred.png", dpi = 300)
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/rmse_pred.eps", dpi = 300)
+        return rmse_mean
+        
+
+    def plot_predictions(self, X, y, scalerIN, scalerOUT):
+
+        # Create prediction folder
+        if not os.path.exists(self.config[W_SETTINGS][W_FOLDER] + "/predictions/"):
+            os.makedirs(self.config[W_SETTINGS][W_FOLDER] + "/predictions/")
+
+        predY = self.predict(X)
+
+        # Create var folder
+        if not os.path.exists(self.config[W_SETTINGS][W_FOLDER] + "/predictions/" + str(self.target_var) + "/"):
+            os.makedirs(self.config[W_SETTINGS][W_FOLDER] + "/predictions/" + str(self.target_var) + "/")
+
+        f_idx = list(self.config[W_SETTINGS][W_FEATURES]).index(self.target_var)
+
+        for t in tqdm(range(len(predY))):
+            # test X
+            X_t = np.squeeze(X[t,:,:])
+            X_t = scalerIN.inverse_transform(X_t)
+
+            # test y
+            Y_t = np.squeeze(y[t,:,:])
+            Y_t = scalerOUT.inverse_transform(Y_t)
+
+            # pred y
+            predY_t = np.squeeze(predY[t,:,:])
+            predY_t = scalerOUT.inverse_transform(predY_t)
+
+            plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color = 'green', label = "past")
+            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t[:, f_idx])), Y_t[:, f_idx], color = 'blue', label = "actual")
+            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t[:, f_idx])), predY_t[:, f_idx], color = 'red', label = "pred")
+            plt.title("Multi-step prediction - " + self.target_var)
+            plt.xlabel("step = 0.1s")
+            plt.ylabel(self.target_var)
+            plt.legend()
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/predictions/" + str(self.target_var) + "/" + str(t) + ".png")
+
+            plt.clf()
+                
+        plt.close()

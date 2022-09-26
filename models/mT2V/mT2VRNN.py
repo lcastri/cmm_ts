@@ -3,13 +3,22 @@ from keras.layers import *
 from keras.models import *
 from .T2VRNN import T2VRNN
 from matplotlib import pyplot as plt
-from words import *
+from models.words import *
+import models.utils as utils
+import tqdm
+import numpy as np
+from math import sqrt
+from sklearn.metrics import mean_squared_error
+import os
 
 class mT2VRNN(Model):
     def __init__(self, config):
         super(mT2VRNN, self).__init__()
         self.config = config
         self.channels = dict()
+
+        utils.create_folder(self.config[W_SETTINGS][W_FOLDER])
+        utils.no_warning()
 
         # Multihead
         for var in self.config[W_SETTINGS][W_FEATURES]:
@@ -77,3 +86,69 @@ class mT2VRNN(Model):
 
         with open(self.config[W_SETTINGS][W_FOLDER] + '/history', 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
+
+
+    def RMSE(self, X, y, scalerOUT, show = False):
+        predY = self.predict(X)
+        rmse = np.zeros(shape = (1, y.shape[1]))
+        for t in tqdm(range(len(y))):
+            actualY_t = np.squeeze(y[t,:,:])
+            predY_t = np.squeeze(predY[t,:,:])
+            actualY_t = scalerOUT.inverse_transform(actualY_t)
+            predY_t = scalerOUT.inverse_transform(predY_t)
+            rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W_SETTINGS][W_NFUTURE])])
+        rmse_mean = np.sum(rmse, axis=0)/len(y)
+
+        plt.figure()
+        plt.title("Mean RMSE vs time steps")
+        plt.plot(range(self.config[W_SETTINGS][W_NFUTURE]), rmse_mean)
+        plt.xlabel("Time steps")
+        plt.xlabel("Mean RMSE")
+        if show:
+            plt.show()
+        else:
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/rmse_pred.png", dpi = 300)
+            plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/plots/rmse_pred.eps", dpi = 300)
+        return rmse_mean
+        
+
+    def plot_predictions(self, X, y, scalerIN, scalerOUT):
+
+        # Create prediction folder
+        if not os.path.exists(self.config[W_SETTINGS][W_FOLDER] + "/predictions/"):
+            os.makedirs(self.config[W_SETTINGS][W_FOLDER] + "/predictions/")
+
+        predY = self.predict(X)
+        for f in self.config[W_SETTINGS][W_FEATURES]:
+
+            # Create var folder
+            if not os.path.exists(self.config[W_SETTINGS][W_FOLDER] + "/predictions/" + str(f) + "/"):
+                os.makedirs(self.config[W_SETTINGS][W_FOLDER] + "/predictions/" + str(f) + "/")
+
+            f_idx = list(self.config[W_SETTINGS][W_FEATURES]).index(f)
+
+            for t in tqdm(range(len(predY))):
+                # test X
+                X_t = np.squeeze(X[t,:,:])
+                X_t = scalerIN.inverse_transform(X_t)
+
+                # test y
+                Y_t = np.squeeze(y[t,:,:])
+                Y_t = scalerOUT.inverse_transform(Y_t)
+
+                # pred y
+                predY_t = np.squeeze(predY[t,:,:])
+                predY_t = scalerOUT.inverse_transform(predY_t)
+
+                plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color = 'green', label = "past")
+                plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t[:, f_idx])), Y_t[:, f_idx], color = 'blue', label = "actual")
+                plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t[:, f_idx])), predY_t[:, f_idx], color = 'red', label = "pred")
+                plt.title("Multi-step prediction - " + f)
+                plt.xlabel("step = 0.1s")
+                plt.ylabel(f)
+                plt.legend()
+                plt.savefig(self.config[W_SETTINGS][W_FOLDER] + "/predictions/" + str(f) + "/" + str(t) + ".png")
+
+                plt.clf()
+                
+        plt.close()

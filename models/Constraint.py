@@ -12,7 +12,3 @@ class Between(Constraint):
 
     def __call__(self, w): 
         return K.clip(w, self.min_value, self.max_value)
-
-    def get_config(self):
-        return {'min_value': self.min_value,
-                'max_value': self.max_value}

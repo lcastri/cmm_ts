@@ -1,42 +1,61 @@
-from T2V_model.mT2VRNN import mT2VRNN
+
+# Models import
+from models.mCNNLSTM.mIACNNED import mIACNNED
+from models.mIAED.mIAED import mIAED
+from models.mT2V.mT2VRNN import mT2VRNN
+from models.sIAED.IAED import IAED
+from models.sT2V.T2VRNN import T2VRNN
+
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from Data import Data
-import os 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
 from keras.layers import *
 from keras.models import *
 from keras.optimizers import Adam
 from keras.utils.vis_utils import plot_model
-import logging
-import tensorflow as tf
-tf.get_logger().setLevel(logging.ERROR)
-import absl.logging
-absl.logging.set_verbosity(absl.logging.ERROR) 
 from parameters import *
-from kerashypetune import KerasGridSearch
 
 
-def create_folder(folder):
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    if not os.path.exists(folder + "plots"):
-        os.makedirs(folder + "plots")
+# # Multi-output data initialization
+# d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC)
+# d.downsample(10)
+# X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 
-
-# Data initialization
-d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC)
+# Single-output data initialization
+target_var = 'd_g'
+d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = target_var)
 d.downsample(10)
-d.scale_data()
 X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
-create_folder(MODEL_FOLDER + "/")
 
 
-
-# Model definition
-model = mT2VRNN(config = config)
-model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
-model.model().summary()
+# # mIACNNED Model definition
+# model = mIACNNED(config = config)
+# model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
+# model.model().summary()
 # plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
+
+# # mIAED Model definition
+# model = mIAED(config = config)
+# model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
+# model.model().summary()
+# plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
+
+# # mT2VRNN Model definition
+# model = mT2VRNN(config = config)
+# model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
+# model.model().summary()
+# plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
+
+# # IAED Model definition
+# model = IAED(config = config, target_var = target_var)
+# model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'], run_eagerly = True)
+# model.model().summary()
+# plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
+
+# T2VRNN Model definition
+model = T2VRNN(config = config, target_var = target_var)
+model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse'])#, 'mae', 'mape', 'accuracy'], run_eagerly = True)
+model.model().summary()
+plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
 
 # Model fit
 cb_earlystop = EarlyStopping(patience = 10)
@@ -45,4 +64,7 @@ model.fit(x = X_train, y = y_train, validation_data = (X_val, y_val), batch_size
           epochs = 200, callbacks = [cb_checkpoints, cb_earlystop])
 
 # Model evaluation
-model.evaluate(x_test, y_test, BATCH_SIZE)
+model.RMSE(x_test, y_test, d.scalerOUT)
+
+# Model predictions
+model.plot_predictions(x_test, y_test, d.scalerIN, d.scalerOUT)

@@ -1,6 +1,12 @@
 import pandas as pd
 import numpy as np
-from words import *
+from models.words import *
+from models.mCNNLSTM.config import config as mCNNLSTM_config
+from models.mIAED.config import config as mIAED_config
+from models.mT2V.config import config as mT2V_config
+from models.sIAED.config import config as sIAED_config
+from models.sT2V.config import config as sT2V_config
+from models.utils import init_config
 
 # load csv and remove NaNs
 csv_path = "data/training/agent_11_aug.csv"
@@ -17,7 +23,7 @@ N_FEATURES = 8
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
-MODEL_FOLDER = "model_F100step_P200step_multiT2V"
+MODEL_FOLDER = "model_F100step_P200step_sT2V_noatt"
 BATCH_SIZE = 128
 
 
@@ -41,94 +47,44 @@ CM_FPCMCI = np.array([[0.794693885975173,0.0797596212634794,0,0,0.20714749488419
                [0,0.0684969047836938,0.0634190046412317,0,0,0,0,0.972004088748988]])
 
 
+config = init_config(mCNNLSTM_config,
+                     folder = MODEL_FOLDER, 
+                     npast = N_PAST,
+                     nfuture = N_FUTURE,
+                     ndelay = N_DELAY,
+                     nfeatures = N_FEATURES,
+                     features = features)
 
-config = {
+# config_T2V = {
 
-    W_SETTINGS : {
-        W_FOLDER : MODEL_FOLDER,
-        W_NPAST : N_PAST,
-        W_NFUTURE : N_FUTURE,
-        W_NDELAY : N_DELAY,
-        W_NFEATURES : N_FEATURES,
-        W_FEATURES : features,
-        W_USEATT : False
-    },
+#     W_SETTINGS : {
+#         W_FOLDER : MODEL_FOLDER,
+#         W_NPAST : N_PAST,
+#         W_NFUTURE : N_FUTURE,
+#         W_NDELAY : N_DELAY,
+#         W_NFEATURES : N_FEATURES,
+#         W_FEATURES : features,
+#         W_USEATT : False
+#     },
 
-    W_INPUTATT : {
-        W_USECAUSAL : False,
-        W_CMATRIX : CM_FPCMCI,
-        W_CTRAINABLE : False,
-        W_USECONSTRAINT : False,
-        W_TRAINTHRESH : 0.2
-    },
+#     W_INPUTATT : {
+#         W_USECAUSAL : False,
+#         W_CMATRIX : CM_FPCMCI,
+#         W_CTRAINABLE : False,
+#         W_USECONSTRAINT : False,
+#         W_TRAINTHRESH : 0.2
+#     },
 
-    W_ENC : [
-        {W_UNITS : 128,
-         W_RSEQ : False,
-         W_RSTATE : True},
-        # {W_UNITS : 64,
-        #  W_RSEQ  : False,
-        #  W_RSTATE : True}
-        ],
+#     W_T2V : {
+#         W_UNITS : 64
+#     },
 
-    W_DEC : [
-        {W_UNITS : 128,
-         W_RSEQ : True,
-         W_RSTATE : False},
-        # {W_UNITS : 64,
-        #  W_RSEQ : True,
-        #  W_RSTATE : False}
-        ],
-
-    W_OUT : [
-        # {W_UNITS : 256,
-        #  W_DROPOUT : 0.5,
-        #  W_ACT : "relu"},
-        {W_UNITS : 128,
-         W_DROPOUT : None,
-         W_ACT : "relu"},
-        {W_UNITS : 64,
-         W_DROPOUT : None,
-         W_ACT : "relu"}
-    ]
-}
-
-
-config = {
-
-    W_SETTINGS : {
-        W_FOLDER : MODEL_FOLDER,
-        W_NPAST : N_PAST,
-        W_NFUTURE : N_FUTURE,
-        W_NDELAY : N_DELAY,
-        W_NFEATURES : N_FEATURES,
-        W_FEATURES : features,
-        W_USEATT : False
-    },
-
-    W_INPUTATT : {
-        W_USECAUSAL : False,
-        W_CMATRIX : CM_FPCMCI,
-        W_CTRAINABLE : False,
-        W_USECONSTRAINT : False,
-        W_TRAINTHRESH : 0.2
-    },
-
-    W_T2V : {
-        W_UNITS : 64
-    },
-
-    W_RNN : {
-        W_UNITS : 128
-    },
+#     W_RNN : {
+#         W_UNITS : 128
+#     },
     
-    W_OUT : [
-        # {W_UNITS : 256,
-        #  W_DROPOUT : 0.5,
-        #  W_ACT : "relu"},
-        {W_UNITS : 32,
-         W_ACT : "relu"},
-        # {W_UNITS : 64,
-        #  W_ACT : "relu"}
-    ]
-}
+#     W_OUT : [
+#         {W_UNITS : 32,
+#          W_ACT : "relu"},
+#     ]
+# }

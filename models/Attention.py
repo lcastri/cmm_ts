@@ -2,8 +2,8 @@ import tensorflow as tf
 import keras.backend as K
 import numpy as np
 from keras.layers import *
-from .Constraint import Between
-from ..words import *
+from models.Constraint import Between
+from models.words import *
 
 
 class CAttention(Layer):
@@ -51,48 +51,6 @@ class CAttention(Layer):
                             constraint = constraint) 
 
         super(CAttention, self).build(input_shape)
-
-
-    # Dependent from batch size
-    # def call(self, inputs):
-    #     x, past_h, past_c = inputs
-    #     print("driving series shape", x.shape)
-    #     print("past_h shape", past_h.shape)
-    #     print("past_c shape", past_h.shape)
-    #     past_h = tf.reshape(past_h, shape = (past_h.shape[0], past_h.shape[1], 1))
-    #     past_c = tf.reshape(past_c, shape = (past_c.shape[0], past_c.shape[1], 1))
-    #     print("ht-1 shape", past_h.shape)
-    #     print("ct-1 shape", past_c.shape)
-    #     print("Ve shape", self.Ve.shape)
-    #     print("We shape", self.We.shape)
-    #     print("Ue shape", self.Ue.shape)
-
-    #     # Hidden and cell states concatenation
-    #     conc = K.concatenate([past_h, past_c], axis = 1)
-    #     conc = K.concatenate([conc for _ in range(x.shape[-1])], axis = 2)
-    #     # print("[ht-1, ct-1] shape", conc.shape)
-
-    #     # We_conc = tf.matmul(self.We, conc) #FIXME: delete me
-    #     # print("We_conc shape", We_conc.shape)
-
-    #     # Ue_x = tf.matmul(self.Ue, x) #FIXME: delete me
-    #     # print("Ue_x shape", Ue_x.shape)
-
-    #     # We_conc_Ue_x = K.tanh(We_conc + Ue_x) #FIXME: delete me
-    #     # print("tanh(We_conc_Ue_x) shape", We_conc_Ue_x.shape)
-
-    #     # Attention weights pre softmax
-    #     e = tf.matmul(tf.transpose(self.Ve), K.tanh(tf.matmul(self.We, conc) + tf.matmul(self.Ue, x)))
-    #     # print("complete shape", e.shape)
-
-    #     # Attention weights
-    #     alpha = tf.nn.softmax(e, axis = 2)
-    #     # print("alpha shape", alpha.shape)
-
-    #     # New state
-    #     x_tilde = tf.math.multiply(x, alpha)
-    #     # print("x_tilde shape", x_tilde.shape)
-    #     return x_tilde
 
 
     def call(self, inputs):
