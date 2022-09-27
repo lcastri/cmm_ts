@@ -10,7 +10,6 @@ import numpy as np
 from math import sqrt
 from sklearn.metrics import mean_squared_error
 import os
-from keras.optimizers import Adam
 
 
 class sT2VRNN(MyModel):
