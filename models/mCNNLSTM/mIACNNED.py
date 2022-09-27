@@ -6,7 +6,7 @@ from .CNNIAED import CNNIAED
 from models.words import *
 
 
-class sT2VRNN(MyModel):
+class mIACNNED(MyModel):
     def __init__(self, config, target_var):
         super().__init__(config)
         self.target_var = target_var

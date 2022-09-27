@@ -19,6 +19,7 @@ from keras.models import *
 from keras.optimizers import Adam
 from keras.utils.vis_utils import plot_model
 from parameters import *
+os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 
 
 # # Multi-output data initialization
@@ -58,17 +59,14 @@ X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 # plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
 
 # IAED Model definition
-# config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
-#                      ndelay = N_DELAY, nfeatures = N_FEATURES, features = features)
-# model = sIAED(config = config, target_var = target_var)
-# model.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'])
-# model.model().summary()
-# plot_model(model.model(), to_file = MODEL_FOLDER + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
+config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+                     ndelay = N_DELAY, nfeatures = N_FEATURES, features = features)
+model = sIAED(config = config, target_var = target_var)
 
 # # T2VRNN Model definition
-config = init_config(sT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
-                     ndelay = N_DELAY, nfeatures = N_FEATURES, features = features)
-model = sT2VRNN(config = config, target_var = target_var)
+# config = init_config(sT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+#                      ndelay = N_DELAY, nfeatures = N_FEATURES, features = features)
+# model = sT2VRNN(config = config, target_var = target_var)
 
 # Model fit
 cb_earlystop = EarlyStopping(patience = 10)

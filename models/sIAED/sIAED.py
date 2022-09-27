@@ -12,7 +12,7 @@ from sklearn.metrics import mean_squared_error
 import os
 
 
-class sT2VRNN(MyModel):
+class sIAED(MyModel):
     def __init__(self, config, target_var):
         super().__init__(config)
         self.target_var = target_var

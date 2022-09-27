@@ -33,8 +33,8 @@ class MyModel(ABC):
             plt.plot(history.history["loss"], label = "Training loss")
             plt.plot(history.history["val_loss"], label = "Validation loss")
             plt.legend()
-            plt.savefig(self.dir_plot + "/loss.png", dpi = 300)
-            plt.savefig(self.dir_plot + "/loss.eps", dpi = 300)
+            plt.savefig(self.plot_dir + "/loss.png", dpi = 300)
+            plt.savefig(self.plot_dir + "/loss.eps", dpi = 300)
             plt.close()
 
         if "mae" in history.history.keys():
@@ -42,8 +42,8 @@ class MyModel(ABC):
             plt.plot(history.history["mae"], label = "Training mae")
             plt.plot(history.history["val_mae"], label = "Validation mae")
             plt.legend()
-            plt.savefig(self.dir_plot + "/mae.png", dpi = 300)
-            plt.savefig(self.dir_plot + "/mae.eps", dpi = 300)
+            plt.savefig(self.plot_dir + "/mae.png", dpi = 300)
+            plt.savefig(self.plot_dir + "/mae.eps", dpi = 300)
             plt.close()
 
         if "mape" in history.history.keys():
@@ -51,8 +51,8 @@ class MyModel(ABC):
             plt.plot(history.history["mape"], label = "Training mape")
             plt.plot(history.history["val_mape"], label = "Validation mape")
             plt.legend()
-            plt.savefig(self.dir_plot + "/mape.png", dpi = 300)
-            plt.savefig(self.dir_plot + "/mape.eps", dpi = 300)
+            plt.savefig(self.plot_dir + "/mape.png", dpi = 300)
+            plt.savefig(self.plot_dir + "/mape.eps", dpi = 300)
             plt.close()
 
         if "accuracy" in history.history.keys():
@@ -60,8 +60,8 @@ class MyModel(ABC):
             plt.plot(history.history["accuracy"], label = "Training accuracy")
             plt.plot(history.history["val_accuracy"], label = "Validation accuracy")
             plt.legend()
-            plt.savefig(self.dir_plot + "/accuracy.png", dpi = 300)
-            plt.savefig(self.dir_plot + "/accuracy.eps", dpi = 300)
+            plt.savefig(self.plot_dir + "/accuracy.png", dpi = 300)
+            plt.savefig(self.plot_dir + "/accuracy.eps", dpi = 300)
             plt.close()
 
         with open(self.model_dir + '/history', 'wb') as file_pi:
