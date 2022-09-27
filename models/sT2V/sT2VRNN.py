@@ -65,6 +65,7 @@ class sT2VRNN(MyModel):
         plt.plot(range(self.config[W_SETTINGS][W_NFUTURE]), rmse_mean)
         plt.xlabel("Time steps")
         plt.xlabel("Mean RMSE")
+        plt.grid()
         if show:
             plt.show()
         else:
@@ -111,6 +112,7 @@ class sT2VRNN(MyModel):
             plt.title("Multi-step prediction - " + self.target_var)
             plt.xlabel("step = 0.1s")
             plt.ylabel(self.target_var)
+            plt.grid()
             plt.legend()
             plt.savefig(self.pred_dir + "/" + str(self.target_var) + "/" + str(t) + ".png")
 

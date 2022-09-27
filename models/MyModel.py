@@ -33,6 +33,7 @@ class MyModel(ABC):
             plt.plot(history.history["loss"], label = "Training loss")
             plt.plot(history.history["val_loss"], label = "Validation loss")
             plt.legend()
+            plt.grid()
             plt.savefig(self.plot_dir + "/loss.png", dpi = 300)
             plt.savefig(self.plot_dir + "/loss.eps", dpi = 300)
             plt.close()
@@ -42,6 +43,7 @@ class MyModel(ABC):
             plt.plot(history.history["mae"], label = "Training mae")
             plt.plot(history.history["val_mae"], label = "Validation mae")
             plt.legend()
+            plt.grid()
             plt.savefig(self.plot_dir + "/mae.png", dpi = 300)
             plt.savefig(self.plot_dir + "/mae.eps", dpi = 300)
             plt.close()
@@ -51,6 +53,7 @@ class MyModel(ABC):
             plt.plot(history.history["mape"], label = "Training mape")
             plt.plot(history.history["val_mape"], label = "Validation mape")
             plt.legend()
+            plt.grid()
             plt.savefig(self.plot_dir + "/mape.png", dpi = 300)
             plt.savefig(self.plot_dir + "/mape.eps", dpi = 300)
             plt.close()
@@ -60,6 +63,7 @@ class MyModel(ABC):
             plt.plot(history.history["accuracy"], label = "Training accuracy")
             plt.plot(history.history["val_accuracy"], label = "Validation accuracy")
             plt.legend()
+            plt.grid()
             plt.savefig(self.plot_dir + "/accuracy.png", dpi = 300)
             plt.savefig(self.plot_dir + "/accuracy.eps", dpi = 300)
             plt.close()
@@ -89,6 +93,7 @@ class MyModel(ABC):
         plt.plot(range(self.config[W_SETTINGS][W_NFUTURE]), rmse_mean)
         plt.xlabel("Time steps")
         plt.xlabel("Mean RMSE")
+        plt.grid()
         if show:
             plt.show()
         else:
@@ -96,90 +101,6 @@ class MyModel(ABC):
             plt.savefig(self.plot_dir + "/rmse_pred.eps", dpi = 300)
         plt.close()
         return rmse_mean
-    # def RMSE(self, X, y, scaler, show = False):
-    #     print('\n##')
-    #     print('## Prediction evaluation through RMSE')
-    #     print('##')
-
-    #     t_idx = self.config[W_SETTINGS][W_FEATURES].index(self.target_var)
-    #     dummy_y = np.zeros(shape = (y.shape[1], self.config[W_SETTINGS][W_NFEATURES]))
-            
-    #     predY = self.predict(X)
-    #     rmse = np.zeros(shape = (1, y.shape[1]))
-    #     for t in tqdm(range(len(y)), desc = 'RMSE'):
-                
-    #         # Invert scaling actual
-    #         actualY_t = np.squeeze(y[t,:,:])
-    #         dummy_y[:, t_idx] = actualY_t 
-    #         actualY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
-    #         actualY_t = np.reshape(actualY_t, (actualY_t.shape[0], 1))
-
-    #         # Invert scaling pred
-    #         predY_t = np.squeeze(predY[t,:,:])
-    #         dummy_y[:, t_idx] = predY_t
-    #         predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
-    #         predY_t = np.reshape(predY_t, (predY_t.shape[0], 1))
-
-    #         rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W_SETTINGS][W_NFUTURE])])
-    #     rmse_mean = np.sum(rmse, axis = 0)/len(y)
-
-    #     plt.figure()
-    #     plt.title("Mean RMSE vs time steps")
-    #     plt.plot(range(self.config[W_SETTINGS][W_NFUTURE]), rmse_mean)
-    #     plt.xlabel("Time steps")
-    #     plt.xlabel("Mean RMSE")
-    #     if show:
-    #         plt.show()
-    #     else:
-    #         plt.savefig(self.plot_dir + "/rmse_pred.png", dpi = 300)
-    #         plt.savefig(self.plot_dir + "/rmse_pred.eps", dpi = 300)
-    #     plt.close()
-    #     return rmse_mean
-        
-
-    # def plot_predictions(self, X, y, scaler):
-    #     print('\n##')
-    #     print('## Predictions')
-    #     print('##')
-
-    #     t_idx = self.config[W_SETTINGS][W_FEATURES].index(self.target_var)
-    #     dummy_y = np.zeros(shape = (y.shape[1], self.config[W_SETTINGS][W_NFEATURES]))
-
-    #     predY = self.predict(X)
-
-    #     # Create var folder
-    #     if not os.path.exists(self.pred_dir + "/" + str(self.target_var) + "/"):
-    #         os.makedirs(self.pred_dir + "/" + str(self.target_var) + "/")
-
-    #     f_idx = list(self.config[W_SETTINGS][W_FEATURES]).index(self.target_var)
-
-    #     for t in tqdm(range(len(predY)), desc = self.target_var):
-    #         # test X
-    #         X_t = np.squeeze(X[t,:,:])
-    #         X_t = scaler.inverse_transform(X_t)
-
-    #         # test y
-    #         Y_t = np.squeeze(y[t,:,:])
-    #         dummy_y[:, t_idx] = Y_t 
-    #         Y_t = scaler.inverse_transform(dummy_y)[:, t_idx]
-
-    #         # pred y
-    #         predY_t = np.squeeze(predY[t,:,:])
-    #         dummy_y[:, t_idx] = predY_t
-    #         predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
-
-    #         plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color = 'green', label = "past")
-    #         plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t)), Y_t, color = 'blue', label = "actual")
-    #         plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t)), predY_t, color = 'red', label = "pred")
-    #         plt.title("Multi-step prediction - " + self.target_var)
-    #         plt.xlabel("step = 0.1s")
-    #         plt.ylabel(self.target_var)
-    #         plt.legend()
-    #         plt.savefig(self.pred_dir + "/" + str(self.target_var) + "/" + str(t) + ".png")
-
-    #         plt.clf()
-                
-    #     plt.close()
 
 
     def plot_predictions(self, X, y, scaler):
@@ -215,6 +136,7 @@ class MyModel(ABC):
                 plt.title("Multi-step prediction - " + f)
                 plt.xlabel("step = 0.1s")
                 plt.ylabel(f)
+                plt.grid()
                 plt.legend()
                 plt.savefig(self.pred_dir + "/" + str(f) + "/" + str(t) + ".png")
 
