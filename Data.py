@@ -34,8 +34,9 @@ class Data():
         self.test_perc = test_prec
         
         self.target = target
-        self.scalerIN = None
-        self.scalerOUT = None
+        self.scaler = None
+        # self.scalerIN = None
+        # self.scalerOUT = None
 
 
     def get_sets(self, seq):
@@ -44,20 +45,26 @@ class Data():
         test_len = int(len(self.data) * self.test_perc)
         return seq[:train_len], seq[train_len:train_len + val_len], seq[train_len + val_len:]
 
+
     def downsample(self, step):
         self.data = pd.DataFrame(self.data.values[::step, :], columns=self.data.columns)
 
+
     def scale_data(self):
         df = self.data.astype(float)
-        self.scalerIN = MinMaxScaler()
-        self.scalerIN = self.scalerIN.fit(df)
-        self.input_scaled = self.scalerIN.transform(df)
+        self.scaler = MinMaxScaler()
+        self.scaler = self.scaler.fit(df)
+        self.data_scaled = self.scaler.transform(df)
+        # df = self.data.astype(float)
+        # self.scaler = MinMaxScaler()
+        # self.scaler = self.scaler.fit(df)
+        # self.input_scaled = self.scaler.transform(df)
 
-        if self.target != ALL:
-            out_seq = np.array(df[self.target]).reshape((len(df[self.target]), -1))
-        self.scalerOUT = MinMaxScaler()
-        self.scalerOUT = self.scalerOUT.fit(out_seq if self.target != ALL else df)
-        self.output_scaled = self.scalerOUT.transform(out_seq if self.target != ALL else df)
+        # if self.target != ALL:
+        #     out_seq = np.array(df[self.target]).reshape((len(df[self.target]), -1))
+        # self.scalerOUT = MinMaxScaler()
+        # self.scalerOUT = self.scalerOUT.fit(out_seq if self.target != ALL else df)
+        # self.output_scaled = self.scalerOUT.transform(out_seq if self.target != ALL else df)
 
 
     def split_sequence(self):
@@ -67,7 +74,10 @@ class Data():
             forecast_end = self.n_delay + lag_end + self.n_future
             if forecast_end > len(self.input_scaled):
                 break
-            seq_x, seq_y = self.input_scaled[i:lag_end], self.output_scaled[self.n_delay + lag_end:forecast_end]
+            if self.target == ALL:
+                seq_x, seq_y = self.data_scaled[i:lag_end], self.data_scaled[self.n_delay + lag_end:forecast_end]
+            else:
+                seq_x, seq_y = self.data_scaled[i:lag_end], self.data_scaled[self.n_delay + lag_end:forecast_end][self.target]
             X.append(seq_x)
             y.append(seq_y)
         return np.array(X), np.array(y)
