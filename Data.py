@@ -69,18 +69,24 @@ class Data():
 
     def split_sequence(self):
         X, y = list(), list()
-        for i in range(len(self.input_scaled)): 
+        for i in range(len(self.data_scaled)): 
             lag_end = i + self.n_past
             forecast_end = self.n_delay + lag_end + self.n_future
-            if forecast_end > len(self.input_scaled):
+            if forecast_end > len(self.data_scaled):
                 break
             if self.target == ALL:
                 seq_x, seq_y = self.data_scaled[i:lag_end], self.data_scaled[self.n_delay + lag_end:forecast_end]
             else:
-                seq_x, seq_y = self.data_scaled[i:lag_end], self.data_scaled[self.n_delay + lag_end:forecast_end][self.target]
+                t = list(self.data.columns).index(self.target)
+                seq_x, seq_y = self.data_scaled[i:lag_end], self.data_scaled[self.n_delay + lag_end:forecast_end, t]
             X.append(seq_x)
             y.append(seq_y)
-        return np.array(X), np.array(y)
+
+        X = np.array(X)
+        y = np.array(y)
+        if self.target != ALL:
+            y = y.reshape((y.shape[0], y.shape[1], -1))
+        return X, y
 
 
     def get_timeseries(self):

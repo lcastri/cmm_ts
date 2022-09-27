@@ -6,7 +6,7 @@ from models.words import *
 
 
 class CNNIAED(Layer):
-    def __init__(self, config, target_var, name = "IAED"):
+    def __init__(self, config, target_var, name = "CNNIAED"):
         super(CNNIAED, self).__init__(name = name)
         self.config = config
         self.target_var = target_var

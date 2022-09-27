@@ -3,7 +3,13 @@ from keras.models import *
 from keras.utils.vis_utils import plot_model
 from models.MyModel import MyModel
 from .IAED import IAED
+from matplotlib import pyplot as plt
 from models.words import *
+from tqdm import tqdm
+import numpy as np
+from math import sqrt
+from sklearn.metrics import mean_squared_error
+import os
 
 
 class sT2VRNN(MyModel):
@@ -16,22 +22,104 @@ class sT2VRNN(MyModel):
 
     def create_model(self) -> Model:
         inp = Input(shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
-        
-        # Multihead
-        channels = list()
-        for var in self.config[W_SETTINGS][W_FEATURES]:
-            channels.append(IAED(self.config, var, name = var + "_IAED")(inp))
-
-        # Concatenation
-        y = concatenate(channels, axis = 2)
+        x = IAED(self.config, self.target_var)(inp)
     
-        m = Model(inp, y)
+        m = Model(inp, x)
         m.compile(loss='mse', optimizer = 'adam', metrics=['mse', 'mae', 'mape', 'accuracy'])
         # m.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse'])
         # m.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'])
 
         m.summary()
         return m
+
+
+    def RMSE(self, X, y, scaler, show = False):
+        print('\n##')
+        print('## Prediction evaluation through RMSE')
+        print('##')
+
+        t_idx = self.config[W_SETTINGS][W_FEATURES].index(self.target_var)
+        dummy_y = np.zeros(shape = (y.shape[1], 8))
+        
+        predY = self.model.predict(X)
+        rmse = np.zeros(shape = (1, y.shape[1]))
+        for t in tqdm(range(len(y)), desc = 'RMSE'):
+            
+            # Invert scaling actual
+            actualY_t = np.squeeze(y[t,:,:])
+            dummy_y[:, t_idx] = actualY_t 
+            actualY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
+            actualY_t = np.reshape(actualY_t, (actualY_t.shape[0], 1))
+
+            # Invert scaling pred
+            predY_t = np.squeeze(predY[t,:,:])
+            dummy_y[:, t_idx] = predY_t
+            predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
+            predY_t = np.reshape(predY_t, (predY_t.shape[0], 1))
+
+            rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W_SETTINGS][W_NFUTURE])])
+        rmse_mean = np.sum(rmse, axis=0)/len(y)
+
+        plt.figure()
+        plt.title("Mean RMSE vs time steps")
+        plt.plot(range(self.config[W_SETTINGS][W_NFUTURE]), rmse_mean)
+        plt.xlabel("Time steps")
+        plt.xlabel("Mean RMSE")
+        if show:
+            plt.show()
+        else:
+            plt.savefig(self.plot_dir + "/rmse_pred.png", dpi = 300)
+            plt.savefig(self.plot_dir + "/rmse_pred.eps", dpi = 300)
+        plt.close()
+        return rmse_mean
+        
+
+    def plot_predictions(self, X, y, scaler):
+        print('\n##')
+        print('## Predictions')
+        print('##')
+
+        t_idx = self.config[W_SETTINGS][W_FEATURES].index(self.target_var)
+        dummy_y = np.zeros(shape = (y.shape[1], 8))
+
+        predY = self.model.predict(X)
+
+        # Create var folder
+        if not os.path.exists(self.pred_dir + "/" + str(self.target_var) + "/"):
+            os.makedirs(self.pred_dir + "/" + str(self.target_var) + "/")
+
+        f_idx = list(self.config[W_SETTINGS][W_FEATURES]).index(self.target_var)
+
+        for t in tqdm(range(len(predY)), desc = self.target_var):
+            # test X
+            X_t = np.squeeze(X[t,:,:])
+            X_t = scaler.inverse_transform(X_t)
+
+            # test y
+            Y_t = np.squeeze(y[t,:,:])
+            dummy_y[:, t_idx] = Y_t 
+            Y_t = scaler.inverse_transform(dummy_y)[:, t_idx]
+
+            # pred y
+            predY_t = np.squeeze(predY[t,:,:])
+            dummy_y[:, t_idx] = predY_t
+            predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
+
+            plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color = 'green', label = "past")
+            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t)), Y_t, color = 'blue', label = "actual")
+            plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t)), predY_t, color = 'red', label = "pred")
+            plt.title("Multi-step prediction - " + self.target_var)
+            plt.xlabel("step = 0.1s")
+            plt.ylabel(self.target_var)
+            plt.legend()
+            plt.savefig(self.pred_dir + "/" + str(self.target_var) + "/" + str(t) + ".png")
+
+            plt.clf()
+                
+        plt.close()
+
+
+
 
 
 # from math import sqrt
@@ -50,33 +138,23 @@ class sT2VRNN(MyModel):
 # from sklearn.metrics import mean_squared_error
 
 
-# class mIAED(Model):
-#     def __init__(self, config):
-#         super(mIAED, self).__init__()
+# class sIAED(Model):
+#     def __init__(self, config, target_var):
+#         super(sIAED, self).__init__()
 #         self.config = config
+#         self.target_var = target_var
 #         self.channels = dict()
 
 #         self.dir_plot = utils.create_plot_dir(self.config[W_SETTINGS][W_FOLDER])
 #         utils.no_warning()
 
-#         # Multihead
-#         for var in self.config[W_SETTINGS][W_FEATURES]:
-#             self.channels[var] = IAED(self.config, var, name = var + "_IAED")
-
-#         # Concatenation
-#         self.concat = Concatenate(axis = 2)
+#         self.channels = IAED(self.config, target_var, name = target_var + "_IAED")
     
 
 #     def call(self, input_sequence):
-#         resMultiHead = list()
 #         x = input_sequence
 
-#         for var in self.config[W_SETTINGS][W_FEATURES]:
-#             resMultiHead.append(self.channels[var](x))
-        
-#         concat = self.concat(resMultiHead)
-
-#         return concat
+#         return self.channels(x)
 
     
 #     def model(self):
@@ -87,8 +165,7 @@ class sT2VRNN(MyModel):
 #     def get_config(self):
 #         data = dict()
 #         if self.config[W_SETTINGS][W_USEATT] and self.config[W_INPUTATT][W_USECAUSAL]:
-#             for var in self.config[W_SETTINGS][W_FEATURES]:
-#                 data[var] = self.channels[var].ca.causal.numpy()
+#             data = self.channels.ca.causal.numpy()
 #         return {"causal_weights": data}
 
 
@@ -136,13 +213,25 @@ class sT2VRNN(MyModel):
 #         print('## Prediction evaluation through RMSE')
 #         print('##')
 
+#         t_idx = self.config[W_SETTINGS][W_FEATURES].index(self.target_var)
+#         dummy_y = np.zeros(shape = (y.shape[1], 8))
+        
 #         predY = self.predict(X)
 #         rmse = np.zeros(shape = (1, y.shape[1]))
 #         for t in tqdm(range(len(y)), desc = 'RMSE'):
+            
+#             # Invert scaling actual
 #             actualY_t = np.squeeze(y[t,:,:])
+#             dummy_y[:, t_idx] = actualY_t 
+#             actualY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
+#             actualY_t = np.reshape(actualY_t, (actualY_t.shape[0], 1))
+
+#             # Invert scaling pred
 #             predY_t = np.squeeze(predY[t,:,:])
-#             actualY_t = scaler.inverse_transform(actualY_t)
-#             predY_t = scaler.inverse_transform(predY_t)
+#             dummy_y[:, t_idx] = predY_t
+#             predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
+#             predY_t = np.reshape(predY_t, (predY_t.shape[0], 1))
+
 #             rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W_SETTINGS][W_NFUTURE])])
 #         rmse_mean = np.sum(rmse, axis=0)/len(y)
 
@@ -165,6 +254,9 @@ class sT2VRNN(MyModel):
 #         print('## Predictions')
 #         print('##')
 
+#         t_idx = self.config[W_SETTINGS][W_FEATURES].index(self.target_var)
+#         dummy_y = np.zeros(shape = (y.shape[1], 8))
+
 #         # Create prediction folder
 #         dir_pred = utils.create_pred_dir(self.config[W_SETTINGS][W_FOLDER])
 
@@ -184,15 +276,17 @@ class sT2VRNN(MyModel):
 
 #                 # test y
 #                 Y_t = np.squeeze(y[t,:,:])
-#                 Y_t = scaler.inverse_transform(Y_t)
+#                 dummy_y[:, t_idx] = Y_t 
+#                 Y_t = scaler.inverse_transform(dummy_y)[:, t_idx]
 
 #                 # pred y
 #                 predY_t = np.squeeze(predY[t,:,:])
-#                 predY_t = scaler.inverse_transform(predY_t)
+#                 dummy_y[:, t_idx] = predY_t
+#                 predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
 
 #                 plt.plot(range(t, t + len(X_t[:, f_idx])), X_t[:, f_idx], color = 'green', label = "past")
-#                 plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t[:, f_idx])), Y_t[:, f_idx], color = 'blue', label = "actual")
-#                 plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t[:, f_idx])), predY_t[:, f_idx], color = 'red', label = "pred")
+#                 plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(Y_t)), Y_t, color = 'blue', label = "actual")
+#                 plt.plot(range(t - 1 + len(X_t[:, f_idx]), t - 1 + len(X_t[:, f_idx]) + len(predY_t)), predY_t, color = 'red', label = "pred")
 #                 plt.title("Multi-step prediction - " + f)
 #                 plt.xlabel("step = 0.1s")
 #                 plt.ylabel(f)
