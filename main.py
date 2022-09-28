@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
     # load csv and remove NaNs
     csv_path = ROOT_DIR + "/data/training/agent_11_aug.csv"
-    df = pd.read_csv(csv_path, dtype=(float))
+    df = pd.read_csv(csv_path)
     df.fillna(method="ffill", inplace = True)
     df.fillna(method="bfill", inplace = True)
     features = list(df.columns)
