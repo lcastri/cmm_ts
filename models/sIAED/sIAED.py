@@ -11,23 +11,20 @@ from math import sqrt
 from sklearn.metrics import mean_squared_error
 import os
 
-
 class sIAED(MyModel):
-    def __init__(self, config, target_var):
+    def __init__(self, config, target_var, loss, optimizer, metrics):
         super().__init__(config)
         self.target_var = target_var
-        self.model = self.create_model()
+        self.model = self.create_model(loss, optimizer, metrics)
         plot_model(self.model, to_file = self.model_dir + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
 
 
-    def create_model(self) -> Model:
+    def create_model(self, loss, optimizer, metrics) -> Model:
         inp = Input(shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
         x = IAED(self.config, self.target_var)(inp)
     
         m = Model(inp, x)
-        m.compile(loss='mse', optimizer = 'adam', metrics=['mse', 'mae', 'mape', 'accuracy'])
-        # m.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse'])
-        # m.compile(loss='mse', optimizer = Adam(0.00001), metrics=['mse', 'mae', 'mape', 'accuracy'])
+        m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
 
         m.summary()
         return m
@@ -72,6 +69,9 @@ class sIAED(MyModel):
             plt.savefig(self.plot_dir + "/rmse_pred.png", dpi = 300)
             plt.savefig(self.plot_dir + "/rmse_pred.eps", dpi = 300)
         plt.close()
+        
+        with open(self.model_dir + '/rmse', 'wb') as file_pi:
+            np.save(file_pi, rmse_mean)
         return rmse_mean
         
 

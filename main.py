@@ -11,13 +11,12 @@ from models.sIAED.config import config as sIAED_config
 from models.sT2V.sT2VRNN import sT2VRNN
 from models.sT2V.config import config as sT2V_config
 from models.utils import init_config
-
+from models.AdjLR import AdjLR
 from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.optimizers import Adam
 from Data import Data
 from keras.layers import *
 from keras.models import *
-from keras.optimizers import Adam
-from keras.utils.vis_utils import plot_model
 from parameters import *
 os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 
@@ -60,19 +59,23 @@ X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 
 # IAED Model definition
 config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
-                     ndelay = N_DELAY, nfeatures = N_FEATURES, features = features)
-model = sIAED(config = config, target_var = target_var)
+                     ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
+                     use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True)
+model = sIAED(config = config, target_var = target_var, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
+
 
 # # T2VRNN Model definition
 # config = init_config(sT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
-#                      ndelay = N_DELAY, nfeatures = N_FEATURES, features = features)
-# model = sT2VRNN(config = config, target_var = target_var)
+                    #  ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
+                    #  use_att = False, use_cm = False, cm = None, cm_trainable = False)
+# model = sT2VRNN(config = config, target_var = target_var, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 # Model fit
 cb_earlystop = EarlyStopping(patience = 10)
 cb_checkpoints = ModelCheckpoint(MODEL_FOLDER + '/', save_best_only = True)
+cb_adjLR = AdjLR(model, 40, 0.1, 1)
 model.fit(X = X_train, y = y_train, validation_data = (X_val, y_val), batch_size = BATCH_SIZE, 
-                 epochs = 200, callbacks = [cb_checkpoints, cb_earlystop])
+                 epochs = 300, callbacks = [cb_checkpoints, cb_earlystop, cb_adjLR])
 
 # Model evaluation
 model.RMSE(x_test, y_test, d.scaler)

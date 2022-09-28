@@ -14,8 +14,9 @@ class IAED(Layer):
 
         # Input attention
         if self.config[W_SETTINGS][W_USEATT]:
+            causal_vec = np.array(self.config[W_INPUTATT][W_CMATRIX][self.config[W_SETTINGS][W_FEATURES].index(self.target_var), :]) if self.config[W_INPUTATT][W_USECAUSAL] else None
             self.ca = CAttention(self.config, 
-                                 np.array(self.config[W_INPUTATT][W_CMATRIX][self.config[W_SETTINGS][W_FEATURES].index(self.target_var), :]), 
+                                 causal_vec, 
                                  name = self.target_var + '_CA')
            
         # Encoders

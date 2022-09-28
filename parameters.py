@@ -15,14 +15,14 @@ df.fillna(method="bfill", inplace = True)
 features = list(df.columns)
 
 # Parameters definition
-N_FUTURE = 100
-N_PAST = 200
+N_FUTURE = 300
+N_PAST = 600
 N_DELAY = 0
 N_FEATURES = 8
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
-MODEL_FOLDER = "sIAED_F100_P200_class_noatt_new"
+MODEL_FOLDER = "sIAED_F300_P600_catt_train"
 BATCH_SIZE = 128
 
 
