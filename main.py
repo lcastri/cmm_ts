@@ -191,7 +191,7 @@ if __name__ == "__main__":
     cbs = list()
     cbs.append(EarlyStopping(patience = PATIENCE))
     cbs.append(ModelCheckpoint(MODEL_FOLDER + '/', save_best_only = True))
-    if ADJLR is not None: cbs.append(AdjLR(model, ADJLR[0], ADJLR[1], ADJLR[2], 1))
+    if ADJLR is not None: cbs.append(AdjLR(model, int(ADJLR[0]), float(ADJLR[1]), bool(ADJLR[2]), 1))
     model.fit(X = X_train, y = y_train, validation_data = (X_val, y_val), batch_size = BATCH_SIZE, 
              epochs = EPOCHS, callbacks = cbs)
 
