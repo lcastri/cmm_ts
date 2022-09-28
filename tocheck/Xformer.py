@@ -4,7 +4,7 @@ from keras.layers import *
 from keras.models import *
 from kerashypetune import KerasGridSearch
 from keras import backend as K
-from parameters import *
+from constants import *
 import os
 from Data import Data
 import pickle

@@ -3,10 +3,25 @@ import logging
 import tensorflow as tf
 import absl.logging
 from .words import *
-from parameters import ROOT_DIR
+from constants import ROOT_DIR
+from enum import Enum
+
+class Models(Enum):
+    sIAED = "sIAED"
+    mIAED = "mIAED"
+    sT2V = "sT2V" 
+    mT2V = "mT2V" 
 
 
-def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, use_att = False, use_cm = False, cm = None, cm_trainable = False):
+MODELS = {
+    Models.sIAED.value : "Single-output Input Attention Encoder Decoder",
+    Models.mIAED.value : "Multi-output Input Attention Encoder Decoder",
+    Models.sT2V.value : "Single-output Time2Vector LSTM",
+    Models.mT2V.value : "Multi-output Time2Vector LSTM"
+}
+
+
+def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, use_att = False, use_cm = False, cm = None, cm_trainable = False, use_constraint = False):
     config[W_SETTINGS][W_FOLDER] = folder
     config[W_SETTINGS][W_NPAST] = npast
     config[W_SETTINGS][W_NFUTURE] = nfuture
@@ -17,6 +32,7 @@ def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, use
     config[W_INPUTATT][W_USECAUSAL] = use_cm
     config[W_INPUTATT][W_CMATRIX] = cm
     config[W_INPUTATT][W_CTRAINABLE] = cm_trainable
+    config[W_INPUTATT][W_USECONSTRAINT] = use_constraint
     return config
 
 

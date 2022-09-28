@@ -6,7 +6,7 @@ plt.style.use('ggplot')
 matplotlib.use( 'tkagg' )
 from sklearn.metrics import mean_squared_error
 from math import sqrt
-from parameters import *
+from constants import *
 from Data import Data
 import numpy as np
 from keras.backend import clear_session

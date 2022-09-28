@@ -46,7 +46,11 @@ class T2VRNN(Layer):
 
         
     def call(self, x):
-        y = self.t2v(x)
+        # Input attention
+        if self.config[W_SETTINGS][W_USEATT]:
+            x_tilde = self.ca([x, self.past_h, self.past_c])
+
+        y = self.t2v(x_tilde if self.config[W_SETTINGS][W_USEATT] else x)
         if self.config[W_SETTINGS][W_USEATT]:
             y, h, c = self.rnn(y)
             self.past_h.assign(tf.expand_dims(h[0], -1))

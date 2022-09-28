@@ -5,7 +5,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 plt.style.use('ggplot')
 matplotlib.use( 'tkagg' )
-from parameters import *
+from constants import *
 from Data import Data
 
 
