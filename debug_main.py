@@ -84,7 +84,7 @@ model = sT2VRNN(config = config, target_var = TARGETVAR, loss = 'mse', optimizer
 # Model fit
 cb_earlystop = EarlyStopping(patience = 10)
 cb_checkpoints = ModelCheckpoint(MODEL_FOLDER + '/', save_best_only = True)
-cb_adjLR = AdjLR(model, 40, 0.1, False, 1)
+cb_adjLR = AdjLR(model, 2, 0.1, True, 1)
 model.fit(X = X_train, y = y_train, validation_data = (X_val, y_val), batch_size = BATCH_SIZE, 
           epochs = 300, callbacks = [cb_checkpoints, cb_earlystop, cb_adjLR])
 
