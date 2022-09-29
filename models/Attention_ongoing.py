@@ -67,21 +67,29 @@ class CAttention(Layer):
         # print("causal shape", self.causal.shape)
 
         # Hidden and cell states concatenation
-        conc = Concatenate(axis=0)([past_h, past_c])
+        conc = Concatenate(axis=-2)([past_h, past_c])
+        # conc = K.transpose(conc)
+        conc = Reshape(target_shape = (conc.shape[-1], conc.shape[-2]))(conc)
+        # print("conc shape", conc.shape)
         dense = self.We(conc)
-        rdense = RepeatVector(x.shape[-1])(dense)
+        # print("dense shape", dense.shape)
+        rdense = tf.repeat(dense, x.shape[-1], 1)
+        # rdense = RepeatVector(x.shape[-1],)(dense)
         rdense = Reshape(target_shape = (rdense.shape[-1], rdense.shape[-2]))(rdense)
         # conc = K.concatenate([conc for _ in range(x.shape[-1])], axis = 1)
-        print("[ht-1, ct-1] shape", rdense.shape)
+        # print("rdense shape", rdense.shape)
+        second = tf.matmul(self.Ue, x)
+        # print("second shape", second.shape)
 
         add = Add()([rdense, tf.matmul(self.Ue, x)])
         add = Activation(activation='tanh')(add)
 
         e = tf.matmul(tf.transpose(self.Ve), add)
-        if self.config[W_INPUTATT][W_USECAUSAL]: e = Add()([e, self.causal])
+        # print("e shape", e.shape)
+        if self.config[W_INPUTATT][W_USECAUSAL]: e = e + self.causal
 
         alpha = Activation(activation='softmax')(e)
-        print("alpha shape", alpha.shape)
+        # print("alpha shape", alpha.shape)
 
         # # Attention weights pre softmax
         # e = tf.matmul(tf.transpose(self.Ve), conc + tf.matmul(self.Ue, x) + self.b)

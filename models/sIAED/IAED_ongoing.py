@@ -50,13 +50,13 @@ class IAED(Layer):
         self.out = Dense(self.config[W_SETTINGS][W_NFUTURE], activation = 'linear', name = self.target_var + '_out')
 
         # Initialization
-        self.past_h = tf.Variable(tf.zeros([self.config[W_ENC][-1][W_UNITS], 1]), 
+        self.past_h = tf.Variable(tf.zeros([128, self.config[W_ENC][-1][W_UNITS], 1]), 
                                             trainable = False, 
-                                            shape = (self.config[W_ENC][-1][W_UNITS], 1),
+                                            shape = (128, self.config[W_ENC][-1][W_UNITS], 1),
                                             name = self.target_var + '_pastH')
-        self.past_c = tf.Variable(tf.zeros([self.config[W_ENC][-1][W_UNITS], 1]), 
+        self.past_c = tf.Variable(tf.zeros([128, self.config[W_ENC][-1][W_UNITS], 1]), 
                                             trainable = False, 
-                                            shape = (self.config[W_ENC][-1][W_UNITS], 1),
+                                            shape = (128, self.config[W_ENC][-1][W_UNITS], 1),
                                             name = self.target_var + '_pastC')
 
 
