@@ -362,3 +362,4 @@ MigrationBackup/
 # folder
 /.vscode
 /data
+/training_result
