@@ -22,13 +22,13 @@ config = {
     },
 
     W_ENC : [
-        {W_UNITS : 64, #128 is better
+        {W_UNITS : 128,
          W_RSEQ : False,
          W_RSTATE : True},
         ],
 
     W_DEC : [
-        {W_UNITS : 64,
+        {W_UNITS : 128,
          W_RSEQ : False,
          W_RSTATE : False},
         ],
