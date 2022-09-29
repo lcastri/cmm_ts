@@ -2,7 +2,7 @@ from keras.layers import *
 from keras.models import *
 from keras.utils.vis_utils import plot_model
 from models.MyModel import MyModel
-from .IAED_ongoing import IAED
+from .IAED import IAED
 from matplotlib import pyplot as plt
 from models.words import *
 from tqdm import tqdm
@@ -24,6 +24,7 @@ class sIAED(MyModel):
         x = IAED(self.config, self.target_var)(inp)
     
         m = Model(inp, x)
+        # m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
         m.compile(loss = loss, optimizer = optimizer, metrics = metrics, run_eagerly = True)
 
         m.summary()
