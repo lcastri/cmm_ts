@@ -36,7 +36,7 @@ N_DELAY = 0
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
-MODEL_FOLDER = "sIAED_F300_P600_catt_train"
+MODEL_FOLDER = "sIAED_F150_P20_catt_f_new"
 BATCH_SIZE = 128
 
 # # Multi-output data initialization
@@ -69,24 +69,24 @@ X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 #                      use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True)
 # model = mT2VRNN(config = config, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
-# # IAED Model definition
-# config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+# IAED Model definition
+config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+                     ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
+                     use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = False)
+model = sIAED(config = config, target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
+
+# # T2VRNN Model definition
+# config = init_config(sT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
 #                      ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
 #                      use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True)
-# model = sIAED(config = config, target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
-
-# T2VRNN Model definition
-config = init_config(sT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
-                     ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
-                     use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True)
-model = sT2VRNN(config = config, target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
+# model = sT2VRNN(config = config, target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 # Model fit
 cb_earlystop = EarlyStopping(patience = 10)
 cb_checkpoints = ModelCheckpoint(MODEL_FOLDER + '/', save_best_only = True)
-cb_adjLR = AdjLR(model, 2, 0.1, True, 1)
+cb_adjLR = AdjLR(model, 150, 0.1, True, 1)
 model.fit(X = X_train, y = y_train, validation_data = (X_val, y_val), batch_size = BATCH_SIZE, 
-          epochs = 300, callbacks = [cb_checkpoints, cb_earlystop, cb_adjLR])
+          epochs = 500, callbacks = [cb_checkpoints, cb_earlystop, cb_adjLR])
 
 # Model evaluation
 model.RMSE(x_test, y_test, d.scaler)
