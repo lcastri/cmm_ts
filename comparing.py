@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 def create_parser():
     parser = argparse.ArgumentParser(description = 'Multivariate Multistep Timeseries forecasting framework.', formatter_class = RawTextHelpFormatter)
     parser.add_argument("models", nargs = '+', help = "list of model name to compare")
-    parser.add_argument("labels", nargs = '+', help = "list of labels for legend")
+    parser.add_argument("--labels", nargs = '+', help = "list of labels for legend", required=True)
     return parser
 
 
