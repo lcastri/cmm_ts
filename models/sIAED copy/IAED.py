@@ -1,5 +1,4 @@
 import numpy as np
-# from models.SimpleAttention import CAttention
 from models.Attention import CAttention
 from keras.layers import *
 from keras.models import *
@@ -66,7 +65,6 @@ class IAED(Layer):
         # Input attention
         if self.config[W_SETTINGS][W_USEATT]:
             x_tilde = self.ca([x, self.past_h, self.past_c])
-            # x_tilde = self.ca(x)
 
         # Encoder
         enc = x_tilde if self.config[W_SETTINGS][W_USEATT] else x

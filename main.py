@@ -48,7 +48,41 @@ def create_parser():
     return parser
 
 
-def print_initialisation():
+def save_init():
+    f = open(ROOT_DIR + "/" + MODEL_FOLDER + "/parameters.txt", "w")
+    f.write("#\n")
+    f.write("# MODEL PARAMETERS\n")
+    f.write("# model = " + str(MODEL) + "\n")
+    if MODEL == Models.sT2V.value or MODEL == Models.sIAED.value: f.write("# target var = " + str(TARGETVAR) + "\n")
+    f.write("# model folder = " + str(MODEL_FOLDER) + "\n")
+    f.write("# past window steps = " + str(N_PAST) + "\n")
+    f.write("# future window steps = " + str(N_FUTURE) + "\n")
+    f.write("# delay steps = " + str(N_DELAY) + "\n")
+    f.write("# dataset split (train, val, test) = " + str((TRAIN_PERC, VAL_PERC, TEST_PERC)) + "\n")
+    
+    f.write("#" + "\n")
+    f.write("# ATTENTION PARAMETERS" + "\n")
+    f.write("# attention = " + str(use_att) + "\n")
+    if use_att and use_cm and cm_trainable:
+        if use_constraint:
+            f.write("# trainable w/ contraint causality = " + str(use_cm) + "\n")
+        else:
+            f.write("# trainable causality = " + str(use_cm) + "\n")
+    elif use_att and use_cm and not cm_trainable:
+        f.write("# Fixed causality = " + str(use_cm) + "\n")
+    
+    f.write("#" + "\n")
+    f.write("# TRAINING PARAMETERS" + "\n")
+    f.write("# batch size = " + str(BATCH_SIZE) + "\n")
+    f.write("# early stopping patience = " + str(PATIENCE) + "\n")
+    f.write("# epochs = " + str(EPOCHS) + "\n")
+    f.write("# learning rate = " + str(LR) + "\n")
+    f.write("# adjust learning rate = " + str(ADJLR) + "\n")
+    f.write("#\n")
+    f.close()
+
+
+def print_init():
     print("\n#")
     print("# MODEL PARAMETERS")
     print("# model =", MODEL)
@@ -78,6 +112,7 @@ def print_initialisation():
     print("# learning rate =", LR)
     print("# adjust learning rate =", ADJLR)
     print("#\n")
+
 
 def cmd_attention_map(att, catt_f, catt_t, catt_tc):
     use_att = False
@@ -135,7 +170,7 @@ if __name__ == "__main__":
     ADJLR = args.adjLR
     TARGETVAR = args.target_var
     use_att, use_cm, cm_trainable, use_constraint = cmd_attention_map(args.att, args.catt_f, args.catt_t, args.catt_tc)
-    print_initialisation()
+    print_init()
 
     if MODEL == Models.sIAED.value:
         if TARGETVAR == None: raise ValueError('for models sIAED/sT2V, target_var needs to be specified')
@@ -186,6 +221,9 @@ if __name__ == "__main__":
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
                              use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint)
         model = mT2VRNN(config = config, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
+
+    # Create .txt file with model parameters
+    save_init()
 
     # Model fit
     cbs = list()
