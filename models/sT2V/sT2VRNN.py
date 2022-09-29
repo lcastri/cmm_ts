@@ -71,7 +71,7 @@ class sT2VRNN(MyModel):
             plt.savefig(self.plot_dir + "/rmse_pred.eps", dpi = 300)
         plt.close()
 
-        with open(self.model_dir + '/rmse', 'wb') as file_pi:
+        with open(self.model_dir + '/rmse.npy', 'wb') as file_pi:
             np.save(file_pi, rmse_mean)
         return rmse_mean
         

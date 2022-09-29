@@ -3,6 +3,8 @@ from models.words import *
 import os
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+RESULT_DIR = ROOT_DIR + "/training_result"
+
 # Parameters definition
 N_FEATURES = 8
 

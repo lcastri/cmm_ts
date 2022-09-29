@@ -3,7 +3,7 @@ import logging
 import tensorflow as tf
 import absl.logging
 from .words import *
-from constants import ROOT_DIR
+from constants import ROOT_DIR, RESULT_DIR
 from enum import Enum
 
 class Models(Enum):
@@ -44,13 +44,54 @@ def no_warning():
 
 
 def create_dir(folder):
-    model_dir = ROOT_DIR + "/" + folder
-    plot_dir = ROOT_DIR + "/" + folder + "/plots"
-    pred_dir = ROOT_DIR + "/" + folder + "/predictions"
+    if not os.path.exists(RESULT_DIR):
+        os.makedirs(RESULT_DIR)
+
+    model_dir = RESULT_DIR + "/" + folder
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
+
+    plot_dir = RESULT_DIR + "/" + folder + "/plots"
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
+        
+    pred_dir = RESULT_DIR + "/" + folder + "/predictions"
     if not os.path.exists(pred_dir):
         os.makedirs(pred_dir)
     return model_dir, plot_dir, pred_dir
+
+
+def cmd_attention_map(att, catt_f, catt_t, catt_tc):
+    # use_att = False
+    # use_cm = False
+    # cm_trainable = False
+    # use_constraint = False
+    # if att:
+    #     use_att = True
+    #     use_cm = False
+    #     cm_trainable = False
+    #     use_constraint = False
+
+    # elif catt_f:
+    #     use_att = True
+    #     use_cm = True
+    #     cm_trainable = False
+    #     use_constraint = False
+
+    # elif catt_t:
+    #     use_att = True
+    #     use_cm = True
+    #     cm_trainable = True
+    #     use_constraint = False
+
+    # elif catt_tc:
+    #     use_att = True
+    #     use_cm = True
+    #     cm_trainable = True
+    #     use_constraint = True
+    use_att = att or catt_f or catt_t or catt_tc
+    use_cm = catt_f or catt_t or catt_tc
+    cm_trainable = catt_t or catt_tc
+    use_constraint = catt_tc
+
+    return use_att, use_cm, cm_trainable, use_constraint

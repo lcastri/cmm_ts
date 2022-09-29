@@ -25,31 +25,8 @@ import argparse
 from argparse import RawTextHelpFormatter
 
 
-def create_parser():
-    model_description = "\n".join([k + " - " + MODELS[k] for k in MODELS])
-
-    parser = argparse.ArgumentParser(description = 'Multivariate Multistep Timeseries forecasting framework.', formatter_class = RawTextHelpFormatter)
-    parser.add_argument("model", type = str, choices = list(MODELS.keys()), help = model_description)
-    parser.add_argument("model_dir", type = str, help = "model folder")
-    parser.add_argument("--npast", type = int, help = "observation window", required = True)
-    parser.add_argument("--nfuture", type = int, help = "forecasting window", required = True)
-    parser.add_argument("--ndelay", type = int, help = "forecasting delay", required = False, default = 0)
-    parser.add_argument("--att", action='store_true', help = "use attention bit", required = False, default = False)
-    parser.add_argument("--catt_f", action='store_true', help = "use causal-attention [FIXED] bit", required = False, default = False)
-    parser.add_argument("--catt_t", action='store_true', help = "use causal-attention [TRAIN] bit", required = False, default = False)
-    parser.add_argument("--catt_tc", action='store_true', help = "use causal-attention [TRAIN w/constraint] bit", required = False, default = False)
-    parser.add_argument("--target_var", type = str, help = "Target variable to forecast [used only if model = sIAED/sT2V]", required = False, default = None)
-    parser.add_argument("--percs", nargs=3, action='append', help = "train/validation/test percentages", required = False, default = [0.6, 0.2, 0.2])
-    parser.add_argument("--patience", type = int, help = "earlystopping patience", required = False, default = 10)
-    parser.add_argument("--batch_size", type = int, help = "batch size", required = False, default = 128)
-    parser.add_argument("--epochs", type = int, help = "epochs", required = False, default = 300)
-    parser.add_argument("--learning_rate", type = float, help = "learning rate", required = False, default = 0.0001)
-    parser.add_argument("--adjLR", nargs=3, help = "Modifying learning rate strategy (freq[epochs], factor, justOnce)", required = False)
-    return parser
-
-
 def save_init():
-    f = open(ROOT_DIR + "/" + MODEL_FOLDER + "/parameters.txt", "w")
+    f = open(RESULT_DIR + "/" + MODEL_FOLDER + "/parameters.txt", "w")
     f.write("#\n")
     f.write("# MODEL PARAMETERS\n")
     f.write("# model = " + str(MODEL) + "\n")
@@ -114,36 +91,27 @@ def print_init():
     print("#\n")
 
 
-def cmd_attention_map(att, catt_f, catt_t, catt_tc):
-    use_att = False
-    use_cm = False
-    cm_trainable = False
-    use_constraint = False
-    if att:
-        use_att = True
-        use_cm = False
-        cm_trainable = False
-        use_constraint = False
+def create_parser():
+    model_description = "\n".join([k + " - " + MODELS[k] for k in MODELS])
 
-    elif catt_f:
-        use_att = True
-        use_cm = True
-        cm_trainable = False
-        use_constraint = False
-
-    elif catt_t:
-        use_att = True
-        use_cm = True
-        cm_trainable = True
-        use_constraint = False
-
-    elif catt_tc:
-        use_att = True
-        use_cm = True
-        cm_trainable = True
-        use_constraint = True
-
-    return use_att, use_cm, cm_trainable, use_constraint
+    parser = argparse.ArgumentParser(description = 'Multivariate Multistep Timeseries forecasting framework.', formatter_class = RawTextHelpFormatter)
+    parser.add_argument("model", type = str, choices = list(MODELS.keys()), help = model_description)
+    parser.add_argument("model_dir", type = str, help = "model folder")
+    parser.add_argument("--npast", type = int, help = "observation window", required = True)
+    parser.add_argument("--nfuture", type = int, help = "forecasting window", required = True)
+    parser.add_argument("--ndelay", type = int, help = "forecasting delay [default 0]", required = False, default = 0)
+    parser.add_argument("--att", action='store_true', help = "use attention bit [default False]", required = False, default = False)
+    parser.add_argument("--catt_f", action='store_true', help = "use causal-attention [FIXED] bit [default False]", required = False, default = False)
+    parser.add_argument("--catt_t", action='store_true', help = "use causal-attention [TRAIN] bit [default False]", required = False, default = False)
+    parser.add_argument("--catt_tc", action='store_true', help = "use causal-attention [TRAIN w/constraint] bit [default False]", required = False, default = False)
+    parser.add_argument("--target_var", type = str, help = "Target variable to forecast [used only if model = sIAED/sT2V] [default None]", required = False, default = None)
+    parser.add_argument("--percs", nargs=3, action='append', help = "[train, val, test[] percentages [default [0.6, 0.2, 0.2]]", required = False, default = [0.6, 0.2, 0.2])
+    parser.add_argument("--patience", type = int, help = "earlystopping patience [default 10]", required = False, default = 10)
+    parser.add_argument("--batch_size", type = int, help = "batch size [default 128]", required = False, default = 128)
+    parser.add_argument("--epochs", type = int, help = "epochs [default 300]", required = False, default = 300)
+    parser.add_argument("--learning_rate", type = float, help = "learning rate [default 0.0001]", required = False, default = 0.0001)
+    parser.add_argument("--adjLR", nargs=3, help = "Modifying learning rate strategy (freq[epochs], factor, justOnce)", required = False)
+    return parser
 
 
 if __name__ == "__main__":
@@ -228,7 +196,7 @@ if __name__ == "__main__":
     # Model fit
     cbs = list()
     cbs.append(EarlyStopping(patience = PATIENCE))
-    cbs.append(ModelCheckpoint(MODEL_FOLDER + '/', save_best_only = True))
+    cbs.append(ModelCheckpoint(RESULT_DIR + '/' + MODEL_FOLDER + '/', save_best_only = True))
     if ADJLR is not None: cbs.append(AdjLR(model, int(ADJLR[0]), float(ADJLR[1]), bool(ADJLR[2]), 1))
     model.fit(X = X_train, y = y_train, validation_data = (X_val, y_val), batch_size = BATCH_SIZE, 
              epochs = EPOCHS, callbacks = cbs)
