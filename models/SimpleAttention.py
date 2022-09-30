@@ -14,7 +14,7 @@ class CAttention(Layer):
 
     def build(self, input_shape):
         n = input_shape[-1]
-        constraint = Between(self.causal_vec, self.config[W_INPUTATT][W_TRAINTHRESH]) if self.config[W_INPUTATT][W_CTRAINABLE] and self.config[W_INPUTATT][W_USECONSTRAINT]else None
+        constraint = Between(self.causal_vec, self.config[W_INPUTATT][W_TRAINTHRESH]) if self.config[W_INPUTATT][W_CTRAINABLE] and self.config[W_INPUTATT][W_USECONSTRAINT] else None
         self.causal = self.add_weight(name = 'causal', shape = (1, n), 
                                       initializer = tf.initializers.Constant(self.causal_vec), 
                                       trainable = self.config[W_INPUTATT][W_CTRAINABLE],

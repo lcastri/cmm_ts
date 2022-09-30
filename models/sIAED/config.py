@@ -18,7 +18,7 @@ config = {
         W_CMATRIX : None,
         W_CTRAINABLE : False,
         W_USECONSTRAINT : False,
-        W_TRAINTHRESH : 0.2
+        W_TRAINTHRESH : None
     },
 
     W_ENC : [

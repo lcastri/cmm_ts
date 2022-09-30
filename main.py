@@ -43,6 +43,7 @@ def save_init():
     if use_att and use_cm and cm_trainable:
         if use_constraint:
             f.write("# trainable w/ contraint causality = " + str(use_cm) + "\n")
+            f.write("# contraint = " + str(constraint) + "\n")
         else:
             f.write("# trainable causality = " + str(use_cm) + "\n")
     elif use_att and use_cm and not cm_trainable:
@@ -76,6 +77,7 @@ def print_init():
     if use_att and use_cm and cm_trainable:
         if use_constraint:
             print("# trainable w/ contraint causality =", use_cm)
+            print("# contraint =", constraint)
         else:
             print("# trainable causality =", use_cm)
     elif use_att and use_cm and not cm_trainable:
@@ -103,9 +105,9 @@ def create_parser():
     parser.add_argument("--att", action='store_true', help = "use attention bit [default False]", required = False, default = False)
     parser.add_argument("--catt_f", action='store_true', help = "use causal-attention [FIXED] bit [default False]", required = False, default = False)
     parser.add_argument("--catt_t", action='store_true', help = "use causal-attention [TRAIN] bit [default False]", required = False, default = False)
-    parser.add_argument("--catt_tc", action='store_true', help = "use causal-attention [TRAIN w/constraint] bit [default False]", required = False, default = False)
+    parser.add_argument("--catt_tc", nargs = 2, help = "use causal-attention [TRAIN w/constraint] bit [default False None]", required = False, default = False)
     parser.add_argument("--target_var", type = str, help = "Target variable to forecast [used only if model = sIAED/sT2V] [default None]", required = False, default = None)
-    parser.add_argument("--percs", nargs=3, action='append', help = "[train, val, test[] percentages [default [0.6, 0.2, 0.2]]", required = False, default = [0.6, 0.2, 0.2])
+    parser.add_argument("--percs", nargs = 3, action='append', help = "[train, val, test[] percentages [default [0.6, 0.2, 0.2]]", required = False, default = [0.6, 0.2, 0.2])
     parser.add_argument("--patience", type = int, help = "earlystopping patience [default 10]", required = False, default = 10)
     parser.add_argument("--batch_size", type = int, help = "batch size [default 128]", required = False, default = 128)
     parser.add_argument("--epochs", type = int, help = "epochs [default 300]", required = False, default = 300)
@@ -137,7 +139,8 @@ if __name__ == "__main__":
     LR = args.learning_rate
     ADJLR = args.adjLR
     TARGETVAR = args.target_var
-    use_att, use_cm, cm_trainable, use_constraint = cmd_attention_map(args.att, args.catt_f, args.catt_t, args.catt_tc)
+    
+    use_att, use_cm, cm_trainable, use_constraint, constraint = cmd_attention_map(args.att, args.catt_f, args.catt_t, args.catt_tc)
     print_init()
 
     if MODEL == Models.sIAED.value:
@@ -150,7 +153,7 @@ if __name__ == "__main__":
         # IAED Model definition
         config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
-                             use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint)
+                             use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
         model = sIAED(config = config, target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
     elif MODEL == Models.sT2V.value:

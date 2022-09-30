@@ -21,7 +21,8 @@ MODELS = {
 }
 
 
-def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, use_att = False, use_cm = False, cm = None, cm_trainable = False, use_constraint = False):
+def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features,
+                use_att = False, use_cm = False, cm = None, cm_trainable = False, use_constraint = False, constraint = None):
     config[W_SETTINGS][W_FOLDER] = folder
     config[W_SETTINGS][W_NPAST] = npast
     config[W_SETTINGS][W_NFUTURE] = nfuture
@@ -33,6 +34,7 @@ def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, use
     config[W_INPUTATT][W_CMATRIX] = cm
     config[W_INPUTATT][W_CTRAINABLE] = cm_trainable
     config[W_INPUTATT][W_USECONSTRAINT] = use_constraint
+    config[W_INPUTATT][W_TRAINTHRESH] = constraint
     return config
 
 
@@ -62,9 +64,10 @@ def create_dir(folder):
 
 
 def cmd_attention_map(att, catt_f, catt_t, catt_tc):
-    use_att = att or catt_f or catt_t or catt_tc
-    use_cm = catt_f or catt_t or catt_tc
-    cm_trainable = catt_t or catt_tc
-    use_constraint = catt_tc
+    use_att = att or catt_f or catt_t or (catt_tc[0] == 'True')
+    use_cm = catt_f or catt_t or (catt_tc[0] == 'True')
+    cm_trainable = catt_t or (catt_tc[0] == 'True')
+    use_constraint = (catt_tc[0] == 'True')
+    constraint = float(catt_tc[1])
 
-    return use_att, use_cm, cm_trainable, use_constraint
+    return use_att, use_cm, cm_trainable, use_constraint, constraint
