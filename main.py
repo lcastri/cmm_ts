@@ -105,7 +105,7 @@ def create_parser():
     parser.add_argument("--att", action='store_true', help = "use attention bit [default False]", required = False, default = False)
     parser.add_argument("--catt_f", action='store_true', help = "use causal-attention [FIXED] bit [default False]", required = False, default = False)
     parser.add_argument("--catt_t", action='store_true', help = "use causal-attention [TRAIN] bit [default False]", required = False, default = False)
-    parser.add_argument("--catt_tc", nargs = 2, help = "use causal-attention [TRAIN w/constraint] bit [default False None]", required = False, default = False)
+    parser.add_argument("--catt_tc", nargs = 2, help = "use causal-attention [TRAIN w/constraint] bit [default False None]", required = False, default = [False, None])
     parser.add_argument("--target_var", type = str, help = "Target variable to forecast [used only if model = sIAED/sT2V] [default None]", required = False, default = None)
     parser.add_argument("--percs", nargs = 3, action='append', help = "[train, val, test[] percentages [default [0.6, 0.2, 0.2]]", required = False, default = [0.6, 0.2, 0.2])
     parser.add_argument("--patience", type = int, help = "earlystopping patience [default 10]", required = False, default = 10)

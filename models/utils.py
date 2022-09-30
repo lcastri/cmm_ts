@@ -68,6 +68,6 @@ def cmd_attention_map(att, catt_f, catt_t, catt_tc):
     use_cm = catt_f or catt_t or (catt_tc[0] == 'True')
     cm_trainable = catt_t or (catt_tc[0] == 'True')
     use_constraint = (catt_tc[0] == 'True')
-    constraint = float(catt_tc[1])
+    constraint = float(catt_tc[1]) if catt_tc[1] is not None else None
 
     return use_att, use_cm, cm_trainable, use_constraint, constraint
