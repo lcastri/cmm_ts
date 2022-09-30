@@ -2,7 +2,7 @@ from keras.layers import *
 from keras.models import *
 from keras.utils.vis_utils import plot_model
 from models.MyModel import MyModel
-from .IAED import IAED
+from .IAEDsimple import IAED
 from matplotlib import pyplot as plt
 from models.words import *
 from tqdm import tqdm

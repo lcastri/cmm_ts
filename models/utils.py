@@ -62,33 +62,6 @@ def create_dir(folder):
 
 
 def cmd_attention_map(att, catt_f, catt_t, catt_tc):
-    # use_att = False
-    # use_cm = False
-    # cm_trainable = False
-    # use_constraint = False
-    # if att:
-    #     use_att = True
-    #     use_cm = False
-    #     cm_trainable = False
-    #     use_constraint = False
-
-    # elif catt_f:
-    #     use_att = True
-    #     use_cm = True
-    #     cm_trainable = False
-    #     use_constraint = False
-
-    # elif catt_t:
-    #     use_att = True
-    #     use_cm = True
-    #     cm_trainable = True
-    #     use_constraint = False
-
-    # elif catt_tc:
-    #     use_att = True
-    #     use_cm = True
-    #     cm_trainable = True
-    #     use_constraint = True
     use_att = att or catt_f or catt_t or catt_tc
     use_cm = catt_f or catt_t or catt_tc
     cm_trainable = catt_t or catt_tc

@@ -24,7 +24,7 @@ config = {
     W_ENC : [
         {W_UNITS : 128,
          W_RSEQ : False,
-         W_RSTATE : True},
+         W_RSTATE : False}, # True for the Attention, False for SimpleAttention
         ],
 
     W_DEC : [
