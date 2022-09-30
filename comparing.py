@@ -22,13 +22,17 @@ if __name__ == "__main__":
     plt.figure()
     for m, l in zip(MODELS, LABELS):
         rmse = np.load(RESULT_DIR + '/' + m + '/rmse.npy')
-        plt.plot(rmse, label = l)
-        
-    plt.legend()
-    plt.grid()
-    fig_name = '__'.join(MODELS)
-    plt.savefig(RESULT_DIR + '/' + fig_name + "__rmse_compare.png", dpi = 300)
-    plt.savefig(RESULT_DIR + '/' + fig_name + "__rmse_compare.eps", dpi = 300)
-    plt.close()
+        if len(rmse) == 1:
+            print("RMSE " + l + " : " + str(rmse))
+        else:
+            plt.plot(rmse, label = l)
+    
+    if len(rmse) != 1:
+        plt.legend()
+        plt.grid()
+        fig_name = '__'.join(MODELS)
+        plt.savefig(RESULT_DIR + '/' + fig_name + "__rmse_compare.png", dpi = 300)
+        plt.savefig(RESULT_DIR + '/' + fig_name + "__rmse_compare.eps", dpi = 300)
+        plt.close()
 
     

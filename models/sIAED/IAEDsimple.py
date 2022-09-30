@@ -1,5 +1,5 @@
 import numpy as np
-from models.SimpleAttention import CAttention
+from models.SelfAttention import CAttention
 from keras.layers import *
 from keras.models import *
 import tensorflow as tf
