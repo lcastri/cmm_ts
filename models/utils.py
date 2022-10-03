@@ -44,25 +44,6 @@ def no_warning():
     absl.logging.set_verbosity(absl.logging.ERROR) 
 
 
-
-def create_dir(folder):
-    if not os.path.exists(RESULT_DIR):
-        os.makedirs(RESULT_DIR)
-
-    model_dir = RESULT_DIR + "/" + folder
-    if not os.path.exists(model_dir):
-        os.makedirs(model_dir)
-
-    plot_dir = RESULT_DIR + "/" + folder + "/plots"
-    if not os.path.exists(plot_dir):
-        os.makedirs(plot_dir)
-        
-    pred_dir = RESULT_DIR + "/" + folder + "/predictions"
-    if not os.path.exists(pred_dir):
-        os.makedirs(pred_dir)
-    return model_dir, plot_dir, pred_dir
-
-
 def cmd_attention_map(att, catt_f, catt_t, catt_tc):
     use_att = att or catt_f or catt_t or (catt_tc[0] == 'True')
     use_cm = catt_f or catt_t or (catt_tc[0] == 'True')
