@@ -1,6 +1,6 @@
 import numpy as np
 # from models.SimpleAttention import CAttention
-from models.Attention import CAttention
+from models.attention.InputAttention import InputAttention
 from keras.layers import *
 from keras.models import *
 import tensorflow as tf
@@ -16,7 +16,7 @@ class IAED(Layer):
         # Input attention
         if self.config[W_SETTINGS][W_USEATT]:
             causal_vec = np.array(self.config[W_INPUTATT][W_CMATRIX][self.config[W_SETTINGS][W_FEATURES].index(self.target_var), :]) if self.config[W_INPUTATT][W_USECAUSAL] else None
-            self.ca = CAttention(self.config, 
+            self.ca = InputAttention(self.config, 
                                  causal_vec, 
                                  name = self.target_var + '_CA')
            

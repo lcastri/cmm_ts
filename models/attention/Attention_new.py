@@ -68,7 +68,7 @@ class CAttention(Layer):
 
         # Hidden and cell states concatenation
         conc = K.concatenate([past_h, past_c], axis = 0)
-        conc = K.concatenate([conc for _ in range(x.shape[-1])], axis = 1)
+        # conc = K.concatenate([conc for _ in range(x.shape[-1])], axis = 1)
         # print("[ht-1, ct-1] shape", conc.shape)
 
         # Attention weights pre softmax

@@ -18,17 +18,18 @@ config = {
         W_CMATRIX : None,
         W_CTRAINABLE : False,
         W_USECONSTRAINT : False,
-        W_TRAINTHRESH : None
+        W_TRAINTHRESH : None,
+        W_UNITS : 256,
     },
 
     W_ENC : [
         {W_UNITS : 128,
          W_RSEQ : False,
-         W_RSTATE : False}, # True for the Attention, False for SimpleAttention
+         W_RSTATE : False},
         ],
 
     W_DEC : [
-        {W_UNITS : 128,
+        {W_UNITS : 256, # 256 very good result
          W_RSEQ : False,
          W_RSTATE : False},
         ],

@@ -6,41 +6,41 @@ from models.Constraint import Between
 from models.words import *
 
 
-class CAttention(Layer):
+class InputAttention(Layer):
     def __init__(self, config, causal_vec : np.array, name = 'Attention'):
-        super(CAttention, self).__init__(name = name)
+        super(InputAttention, self).__init__(name = name)
         self.causal_vec = causal_vec
         self.config = config
 
 
-
-    def build(self, x):
+    def build(self, inputs):
         # input_shape = batch x n_past x n_features
         # T = window size : n_past
         # n = number of driving series : n_features
         # m = size of hidden state + cell state
-        T = x[1]
-        n = x[-1]
-        m = self.config[W_ENC][-1][W_UNITS]
-
-        # Wg = m x 1
-        self.Wg = self.add_weight(name='Wg', shape=(n, m), 
+        input_shape = inputs[0]
+        T = input_shape[1]
+        n = input_shape[-1]
+        m = inputs[1][0] + inputs[2][0]
+        
+        # Ve = T x 1
+        self.Ve = self.add_weight(name='Ve', shape=(T, 1), 
                                   initializer='random_normal', 
                                   trainable = True)
 
-        self.bg = self.add_weight(name = 'bias_g', shape = (T, m), 
-                                  initializer = 'zeros', 
-                                  trainable = True)
-
-        # Wa = T x m
-        self.Wa = self.add_weight(name = 'Wa', shape = (m, T), 
+        # We = T x 2m
+        self.We = self.add_weight(name = 'We', shape = (T, m), 
                                   initializer='random_normal', 
                                   trainable = True)
 
-        self.ba = self.add_weight(name = 'bias_a', shape = (T, n), 
-                                  initializer = 'zeros', 
+        # Ue = T x T
+        self.Ue = self.add_weight(name = 'Ue', shape = (T, T), 
+                                  initializer = 'random_normal', 
                                   trainable = True)
 
+        # self.b = self.add_weight(name = 'bias', shape = (T, n), 
+        #                          initializer = 'zeros', 
+        #                          trainable = True)
 
         if self.config[W_INPUTATT][W_USECAUSAL]:
             constraint = Between(self.causal_vec, self.config[W_INPUTATT][W_TRAINTHRESH]) if self.config[W_INPUTATT][W_CTRAINABLE] and self.config[W_INPUTATT][W_USECONSTRAINT]else None
@@ -49,10 +49,11 @@ class CAttention(Layer):
                             trainable = self.config[W_INPUTATT][W_CTRAINABLE],
                             constraint = constraint) 
 
-        super(CAttention, self).build(x)
+        super(InputAttention, self).build(input_shape)
 
 
-    def call(self, x):
+    def call(self, inputs):
+        x, past_h, past_c = inputs
         # print("Performing layer", self.name)
         # print("X", x.numpy())
         # print("driving series shape", x.shape)
@@ -64,14 +65,14 @@ class CAttention(Layer):
         # print("bias shape", self.b.shape)
         # print("causal shape", self.causal.shape)
 
- 
+        # Hidden and cell states concatenation
+        conc = K.concatenate([past_h, past_c], axis = 0)
+        conc = K.concatenate([conc for _ in range(x.shape[-1])], axis = 1)
+        # print("[ht-1, ct-1] shape", conc.shape)
+
         # Attention weights pre softmax
-        g = K.tanh(K.dot(x, self.Wg) + self.bg)
-        print("g.shape ", g.shape)
-        second = K.dot(g, self.Wa)
-        print("second.shape ", second.shape)
-        alpha = K.sigmoid(K.dot(g, self.Wa) + self.ba)
-        if self.config[W_INPUTATT][W_USECAUSAL]: e = e + self.causal
+        e = tf.matmul(tf.transpose(self.Ve), K.tanh(tf.matmul(self.We, conc) + tf.matmul(self.Ue, x)))
+        # if self.config[W_INPUTATT][W_USECAUSAL]: e = e + self.causal
         # print("e shape", e.shape)
 
         # Attention weights x causal weights
@@ -79,6 +80,7 @@ class CAttention(Layer):
         # print("e*causal shape", e.shape)
 
         # Attention weights
+        alpha = tf.nn.softmax(e, axis = 2)
         # print("alpha shape", alpha.shape)
 
         # New state
@@ -87,3 +89,9 @@ class CAttention(Layer):
         # print("Casual weights", alpha.numpy())
         # print("X tilde", x_tilde.numpy())
         return x_tilde
+
+
+    # def get_config(self):
+    #     if self.config[W_INPUTATT][W_USECAUSAL]:
+    #         return {"causal_vector": self.causal}
+    #     return {"causal_vector": None}

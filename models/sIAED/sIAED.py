@@ -15,17 +15,19 @@ class sIAED(MyModel):
     def __init__(self, config, target_var, loss, optimizer, metrics):
         super().__init__(config)
         self.target_var = target_var
+        self.channels = dict()
+        self.channels[target_var] = IAED(self.config, target_var, name = target_var + "_IAED")
         self.model = self.create_model(loss, optimizer, metrics)
         plot_model(self.model, to_file = self.model_dir + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
-
+        
 
     def create_model(self, loss, optimizer, metrics) -> Model:
         inp = Input(shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
-        x = IAED(self.config, self.target_var)(inp)
+        x = self.channels[self.target_var](inp)
     
         m = Model(inp, x)
-        # m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
-        m.compile(loss = loss, optimizer = optimizer, metrics = metrics, run_eagerly = True)
+        m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
+        # m.compile(loss = loss, optimizer = optimizer, metrics = metrics, run_eagerly = True)
 
         m.summary()
         return m

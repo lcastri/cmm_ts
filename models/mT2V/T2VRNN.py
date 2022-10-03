@@ -3,7 +3,7 @@ from .T2V import T2V
 from models.words import *
 import numpy as np
 import tensorflow as tf
-from models.Attention import CAttention
+from models.attention.InputAttention import InputAttention
 
 
 class T2VRNN(Layer):
@@ -15,7 +15,7 @@ class T2VRNN(Layer):
 
         # Input attention
         if self.config[W_SETTINGS][W_USEATT]:
-            self.ca = CAttention(self.config, 
+            self.ca = InputAttention(self.config, 
                                  np.array(self.config[W_INPUTATT][W_CMATRIX][self.config[W_SETTINGS][W_FEATURES].index(self.target_var), :]), 
                                  name = self.target_var + '_CA')
            

@@ -115,8 +115,8 @@ class MyModel(ABC):
         for f in self.config[W_SETTINGS][W_FEATURES]:
 
             # Create var folder
-            if not os.path.exists(self.pred_dir + "/" + str(self.target_var) + "/"):
-                os.makedirs(self.pred_dir + "/" + str(self.target_var) + "/")
+            if not os.path.exists(self.pred_dir + "/" + str(f) + "/"):
+                os.makedirs(self.pred_dir + "/" + str(f) + "/")
 
             f_idx = list(self.config[W_SETTINGS][W_FEATURES]).index(f)
 
@@ -146,3 +146,14 @@ class MyModel(ABC):
                 plt.clf()
                 
         plt.close()
+
+
+    def save_cmatrix(self):
+        if self.config[W_INPUTATT][W_USECAUSAL]:
+            layers = self.model.layers
+            ca_matrix = [layers[l].selfatt.causal.numpy() for l in range(1, len(layers))]
+            print(ca_matrix)
+            print(self.config[W_INPUTATT][W_CMATRIX])
+
+            with open(self.model_dir + '/cmatrix.npy', 'wb') as file_pi:
+                np.save(file_pi, ca_matrix)

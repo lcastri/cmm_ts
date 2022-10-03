@@ -1,5 +1,5 @@
 import numpy as np
-from models.Attention import CAttention
+from models.attention.InputAttention import InputAttention
 from keras.layers import *
 from keras.models import *
 import tensorflow as tf
@@ -14,7 +14,7 @@ class IAED(Layer):
 
         # Input attention
         if self.config[W_SETTINGS][W_USEATT]:
-            self.ca = CAttention(self.config, 
+            self.ca = InputAttention(self.config, 
                                  np.array(self.config[W_INPUTATT][W_CMATRIX][self.config[W_SETTINGS][W_FEATURES].index(self.target_var), :]), 
                                  name = self.target_var + '_CA')
            

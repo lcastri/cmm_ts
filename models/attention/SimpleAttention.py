@@ -27,3 +27,7 @@ class CAttention(Layer):
         alpha = tf.nn.softmax(self.causal, axis = 1)
         x_tilde = tf.math.multiply(x, alpha)
         return x_tilde
+
+    
+    def get_config(self):
+        return {"causal_vector": self.causal}

@@ -204,6 +204,9 @@ if __name__ == "__main__":
     model.fit(X = X_train, y = y_train, validation_data = (X_val, y_val), batch_size = BATCH_SIZE, 
              epochs = EPOCHS, callbacks = cbs)
 
+    # Save causal matrix
+    model.save_cmatrix()
+
     # Model evaluation
     model.RMSE(x_test, y_test, d.scaler)
 
