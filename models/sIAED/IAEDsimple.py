@@ -15,10 +15,14 @@ class IAED(Layer):
 
         if self.config[W_SETTINGS][W_USEATT]:
 
-            # Attention
+            # Causal vector definition
             causal_vec = np.array(self.config[W_INPUTATT][W_CMATRIX][self.config[W_SETTINGS][W_FEATURES].index(self.target_var), :]) if self.config[W_INPUTATT][W_USECAUSAL] else None
+            
+            # Self attention
             self.selfatt = SelfAttention(self.config, causal_vec, name = self.target_var + '_selfatt')
-            self.inatt = InputAttention(self.config, causal_vec, name = self.target_var + '_inatt')
+            
+            # Input attention
+            self.inatt = InputAttention(self.config, name = self.target_var + '_inatt')
            
             # Encoders
             self.selfenc = LSTM(self.config[W_ENC][0][W_UNITS], 

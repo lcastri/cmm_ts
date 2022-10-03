@@ -154,7 +154,8 @@ if __name__ == "__main__":
         config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
                              use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
-        model = sIAED(config = config, target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
+        model = sIAED(config = config)
+        model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
     elif MODEL == Models.sT2V.value:
         if TARGETVAR == None: raise ValueError('for models sIAED/sT2V, target_var needs to be specified')
@@ -167,7 +168,8 @@ if __name__ == "__main__":
         config = init_config(sT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
                              use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint)
-        model = sT2VRNN(config = config, target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
+        model = sT2VRNN(config = config)
+        model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
     elif MODEL == Models.mIAED.value:
         # Multi-output data initialization
@@ -179,7 +181,8 @@ if __name__ == "__main__":
         config = init_config(mIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
                              use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint)
-        model = mIAED(config = config, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
+        model = mIAED(config = config)
+        model.create_model(loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
     elif MODEL == Models.mT2V.value:
         # Multi-output data initialization
@@ -191,7 +194,8 @@ if __name__ == "__main__":
         config = init_config(mT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
                              use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint)
-        model = mT2VRNN(config = config, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
+        model = mT2VRNN(config = config)
+        model.create_model(loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
     # Create .txt file with model parameters
     save_init()
@@ -211,4 +215,4 @@ if __name__ == "__main__":
     model.RMSE(x_test, y_test, d.scaler)
 
     # Model predictions
-    model.plot_predictions(x_test, y_test, d.scaler)
+    model.predict(x_test, y_test, d.scaler)

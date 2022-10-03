@@ -95,4 +95,4 @@ model.save_cmatrix()
 model.RMSE(x_test, y_test, d.scaler)
 
 # Model predictions
-model.plot_predictions(x_test, y_test, d.scaler)
+model.predict(x_test, y_test, d.scaler)

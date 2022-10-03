@@ -7,10 +7,8 @@ from models.words import *
 
 
 class mT2VRNN(MyModel):
-    def __init__(self, config, loss, optimizer, metrics):
-        super().__init__(config)
-        self.model = self.create_model(loss, optimizer, metrics)
-        plot_model(self.model, to_file = self.model_dir + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
+    def __init__(self, config : dict = None, folder : str = None):
+        super().__init__(config = config, folder = folder)
 
 
     def create_model(self, loss, optimizer, metrics) -> Model:
@@ -28,4 +26,7 @@ class mT2VRNN(MyModel):
         m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
 
         m.summary()
+
+        self.model = m
+        plot_model(self.model, to_file = self.model_dir + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
         return m

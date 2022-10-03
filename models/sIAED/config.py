@@ -19,17 +19,17 @@ config = {
         W_CTRAINABLE : False,
         W_USECONSTRAINT : False,
         W_TRAINTHRESH : None,
-        W_UNITS : 256,
+        W_UNITS : 128,
     },
 
     W_ENC : [
-        {W_UNITS : 128,
+        {W_UNITS : 64,
          W_RSEQ : False,
          W_RSTATE : False},
         ],
 
     W_DEC : [
-        {W_UNITS : 256, # 256 very good result
+        {W_UNITS : 128, # 256 very good result
          W_RSEQ : False,
          W_RSTATE : False},
         ],
