@@ -1,7 +1,6 @@
 from models.utils import *
 from models.AdjLR import AdjLR
-from keras.callbacks import ModelCheckpoint, EarlyStopping, LearningRateScheduler
-# from pyimagesearch.learning_rate_schedulers import StepDecay
+from keras.callbacks import ModelCheckpoint, EarlyStopping
 from keras.optimizers import Adam
 from Data import Data
 from keras.layers import *
@@ -49,7 +48,7 @@ BATCH_SIZE = 128
 TARGETVAR = 'd_g'
 d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = TARGETVAR)
 d.downsample(10)
-X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
+X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
 
 # # mIACNNED Model definition
@@ -74,7 +73,8 @@ X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                      ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
                      use_att = True, use_cm = True, cm = CM_PCMCI, cm_trainable = False)
-model = sIAED(config = config, target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
+model = sIAED(config = config)
+model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 # # T2VRNN Model definition
 # config = init_config(sT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
@@ -85,14 +85,14 @@ model = sIAED(config = config, target_var = TARGETVAR, loss = 'mse', optimizer =
 # Model fit
 cb_earlystop = EarlyStopping(patience = 10)
 cb_checkpoints = ModelCheckpoint("training_result/" + MODEL_FOLDER + '/', save_best_only = True)
-cb_adjLR = AdjLR(model, 150, 0.1, True, 1)
+# cb_adjLR = AdjLR(model, 150, 0.1, True, 1)
 model.fit(X = X_train, y = y_train, validation_data = (X_val, y_val), batch_size = BATCH_SIZE, 
-          epochs = 1, callbacks = [cb_checkpoints, cb_earlystop, cb_adjLR])
+          epochs = 1, callbacks = [cb_checkpoints, cb_earlystop]) #, cb_adjLR
 
 model.save_cmatrix()
 
 # Model evaluation
-model.RMSE(x_test, y_test, d.scaler)
+model.RMSE(X_test, y_test, d.scaler)
 
 # Model predictions
-model.predict(x_test, y_test, d.scaler)
+model.predict(X_test, y_test, d.scaler)

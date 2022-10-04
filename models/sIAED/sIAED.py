@@ -22,8 +22,8 @@ class sIAED(MyModel):
         x = IAED(self.config, target_var, name = target_var + "_IAED")(inp)
     
         m = Model(inp, x)
-        m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
-        # m.compile(loss = loss, optimizer = optimizer, metrics = metrics, run_eagerly = True)
+        # m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
+        m.compile(loss = loss, optimizer = optimizer, metrics = metrics, run_eagerly = True)
 
         m.summary()
         self.model = m

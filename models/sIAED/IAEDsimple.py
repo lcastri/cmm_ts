@@ -5,6 +5,7 @@ from keras.layers import *
 from keras.models import *
 import tensorflow as tf
 from models.words import *
+import keras.backend as K
 
 
 class IAED(Layer):
@@ -25,42 +26,36 @@ class IAED(Layer):
             self.inatt = InputAttention(self.config, name = self.target_var + '_inatt')
            
             # Encoders
-            self.selfenc = LSTM(self.config[W_ENC][0][W_UNITS], 
-                                name = target_var + '_selfenc',
-                                return_sequences = self.config[W_ENC][0][W_RSEQ],
-                                return_state = self.config[W_ENC][0][W_RSTATE],
+            self.selfenc = LSTM(int(self.config[W_ENC][W_UNITS]/2), 
+                                name = target_var + '_selfENC',
+                                return_state = True,
                                 input_shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
-            self.inenc = LSTM(self.config[W_ENC][0][W_UNITS], 
-                            name = target_var + '_inenc',
-                            return_sequences = self.config[W_ENC][0][W_RSEQ],
-                            return_state = True,
-                            input_shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
+
+            self.inenc = LSTM(int(self.config[W_ENC][W_UNITS]/2),
+                              name = target_var + '_inENC',
+                              return_state = True,
+                              input_shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
 
             # Initialization
-            self.past_h = tf.Variable(tf.zeros([self.config[W_ENC][-1][W_UNITS], 1]), 
+            self.past_h = tf.Variable(tf.zeros([int(self.config[W_ENC][W_UNITS]/2), 1]), 
                                                 trainable = False, 
-                                                shape = (self.config[W_ENC][-1][W_UNITS], 1),
+                                                shape = (int(self.config[W_ENC][W_UNITS]/2), 1),
                                                 name = self.target_var + '_pastH')
-            self.past_c = tf.Variable(tf.zeros([self.config[W_ENC][-1][W_UNITS], 1]), 
+            self.past_c = tf.Variable(tf.zeros([int(self.config[W_ENC][W_UNITS]/2), 1]), 
                                                 trainable = False, 
-                                                shape = (self.config[W_ENC][-1][W_UNITS], 1),
+                                                shape = (int(self.config[W_ENC][W_UNITS]/2), 1),
                                                 name = self.target_var + '_pastC')
 
         else:
-            self.enc = LSTM(self.config[W_ENC][0][W_UNITS], 
-                            name = target_var + '_enc',
-                            return_sequences = self.config[W_ENC][0][W_RSEQ],
-                            return_state = self.config[W_ENC][0][W_RSTATE],
+            self.enc = LSTM(self.config[W_ENC][W_UNITS], 
+                            name = target_var + '_ENC',
+                            return_state = True,
                             input_shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
 
         self.repeat = RepeatVector(self.config[W_SETTINGS][W_NFUTURE], name = self.target_var + '_REPEAT')
 
         # Decoder
-        self.decs = list()
-        for i in range(len(self.config[W_DEC])):
-            self.decs.append(LSTM(self.config[W_DEC][i][W_UNITS], 
-                                  name = self.target_var + '_DEC',
-                                  return_sequences = self.config[W_DEC][i][W_RSEQ]))
+        self.dec = LSTM(self.config[W_DEC][W_UNITS], name = self.target_var + '_DEC')
 
         # Dense
         self.outdense = list()
@@ -77,21 +72,24 @@ class IAED(Layer):
             x_inatt = self.inatt([x, self.past_h, self.past_c])
 
             # Encoders
-            h1 = self.selfenc(x_selfatt)
-            h2, h, c = self.inenc(x_inatt)
-            self.past_h.assign(tf.expand_dims(h[0], -1))
-            self.past_c.assign(tf.expand_dims(c[0], -1))
+            enc1, h1, c1 = self.selfenc(x_selfatt)
+            enc2, h2, c2 = self.inenc(x_inatt)
+            self.past_h.assign(tf.expand_dims(h2[-1], -1))
+            self.past_c.assign(tf.expand_dims(c2[-1], -1))
 
-            x = concatenate([h1, h2])
+            x = concatenate([enc1, enc2])
+            h = concatenate([h1, h2])
+            c = concatenate([c1, c2])
         else:
-            x = self.enc(x)
+            x, h, c = self.enc(x)
             
         repeat = self.repeat(x)
             
         # Decoder
-        dec = repeat
-        for i in range(len(self.config[W_DEC])):
-            dec = self.decs[i](dec)
+        if self.config[W_DEC][W_INIT]:
+            dec = self.dec(repeat, initial_state = [h, c])
+        else:
+            dec = self.dec(repeat)
 
         y = dec
         for i in range(len(self.config[W_OUT])):

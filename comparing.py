@@ -8,7 +8,8 @@ from matplotlib import pyplot as plt
 def create_parser():
     parser = argparse.ArgumentParser(description = 'Multivariate Multistep Timeseries forecasting framework.', formatter_class = RawTextHelpFormatter)
     parser.add_argument("models", nargs = '+', help = "list of model name to compare")
-    parser.add_argument("--labels", nargs = '+', help = "list of labels for legend", required=True)
+    parser.add_argument("--labels", nargs = '+', help = "list of labels for legend", required = True)
+    parser.add_argument("--figname", help = "figure name", required = True)
     return parser
 
 
@@ -18,6 +19,7 @@ if __name__ == "__main__":
 
     MODELS = args.models
     LABELS = args.labels
+    FIGNAME = args.figname
 
     plt.figure()
     for m, l in zip(MODELS, LABELS):
@@ -30,9 +32,8 @@ if __name__ == "__main__":
     if len(rmse) != 1:
         plt.legend()
         plt.grid()
-        fig_name = '__'.join(MODELS)
-        plt.savefig(RESULT_DIR + '/' + fig_name + "__rmse_compare.png", dpi = 300)
-        plt.savefig(RESULT_DIR + '/' + fig_name + "__rmse_compare.eps", dpi = 300)
+        plt.savefig(RESULT_DIR + '/' + FIGNAME + ".png", dpi = 300)
+        plt.savefig(RESULT_DIR + '/' + FIGNAME + ".eps", dpi = 300)
         plt.close()
 
     

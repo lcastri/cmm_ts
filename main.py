@@ -41,13 +41,12 @@ def save_init():
     f.write("# ATTENTION PARAMETERS" + "\n")
     f.write("# attention = " + str(use_att) + "\n")
     if use_att and use_cm and cm_trainable:
+        f.write("# trainable causal model = " + args.catt[0] + "\n")
         if use_constraint:
-            f.write("# trainable w/ contraint causality = " + str(use_cm) + "\n")
             f.write("# contraint = " + str(constraint) + "\n")
-        else:
-            f.write("# trainable causality = " + str(use_cm) + "\n")
+
     elif use_att and use_cm and not cm_trainable:
-        f.write("# Fixed causality = " + str(use_cm) + "\n")
+        f.write("# Fixed causality = " + args.catt[0] + "\n")
     
     f.write("#" + "\n")
     f.write("# TRAINING PARAMETERS" + "\n")
@@ -75,13 +74,12 @@ def print_init():
     print("# ATTENTION PARAMETERS")
     print("# attention =", use_att)
     if use_att and use_cm and cm_trainable:
+        print('# trainable causal model =', args.catt[0])
         if use_constraint:
-            print("# trainable w/ contraint causality =", use_cm)
             print("# contraint =", constraint)
-        else:
-            print("# trainable causality =", use_cm)
+
     elif use_att and use_cm and not cm_trainable:
-        print("# Fixed causality =", use_cm)
+        print("# Fixed causal model =", args.catt[0])
     
     print("#")
     print("# TRAINING PARAMETERS")
@@ -102,10 +100,12 @@ def create_parser():
     parser.add_argument("--npast", type = int, help = "observation window", required = True)
     parser.add_argument("--nfuture", type = int, help = "forecasting window", required = True)
     parser.add_argument("--ndelay", type = int, help = "forecasting delay [default 0]", required = False, default = 0)
-    parser.add_argument("--att", action='store_true', help = "use attention bit [default False]", required = False, default = False)
-    parser.add_argument("--catt_f", action='store_true', help = "use causal-attention [FIXED] bit [default False]", required = False, default = False)
-    parser.add_argument("--catt_t", action='store_true', help = "use causal-attention [TRAIN] bit [default False]", required = False, default = False)
-    parser.add_argument("--catt_tc", nargs = 2, help = "use causal-attention [TRAIN w/constraint] bit [default False None]", required = False, default = [False, None])
+    parser.add_argument("--initDEC", action = 'store_true', help = "use ENC final state as init for DEC bit [default False]", required = False, default = False)
+    parser.add_argument("--att", action = 'store_true', help = "use attention bit [default False]", required = False, default = False)
+    parser.add_argument("--catt", nargs = 3, help = "use causal-attention [CAUSAL MATRIX, TRAINABLE, CONSTRAINT] [default None False None]", required = False, default = [None, False, None])
+    # parser.add_argument("--catt_f", nargs = 2, help = "use causal-attention [FIXED] bit [default False None]", required = False, default = False)
+    # parser.add_argument("--catt_t", nargs = 2, help = "use causal-attention [TRAIN] bit [default False None]", required = False, default = False)
+    # parser.add_argument("--catt_tc", nargs = 3, help = "use causal-attention [TRAIN w/constraint] bit [default False None None]", required = False, default = [False, None])
     parser.add_argument("--target_var", type = str, help = "Target variable to forecast [used only if model = sIAED/sT2V] [default None]", required = False, default = None)
     parser.add_argument("--percs", nargs = 3, action='append', help = "[train, val, test[] percentages [default [0.6, 0.2, 0.2]]", required = False, default = [0.6, 0.2, 0.2])
     parser.add_argument("--patience", type = int, help = "earlystopping patience [default 10]", required = False, default = 10)
@@ -139,8 +139,9 @@ if __name__ == "__main__":
     LR = args.learning_rate
     ADJLR = args.adjLR
     TARGETVAR = args.target_var
-    
-    use_att, use_cm, cm_trainable, use_constraint, constraint = cmd_attention_map(args.att, args.catt_f, args.catt_t, args.catt_tc)
+    INITDEC = args.initDEC
+
+    use_att, use_cm, cm, cm_trainable, use_constraint, constraint = cmd_attention_map(args.att, args.catt)
     print_init()
 
     if MODEL == Models.sIAED.value:
@@ -152,8 +153,8 @@ if __name__ == "__main__":
 
         # IAED Model definition
         config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
-                             ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
-                             use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
+                             ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
+                             use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
         model = sIAED(config = config)
         model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
@@ -167,7 +168,7 @@ if __name__ == "__main__":
         # IAED Model definition
         config = init_config(sT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
-                             use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint)
+                             use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint)
         model = sT2VRNN(config = config)
         model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
@@ -179,8 +180,8 @@ if __name__ == "__main__":
 
         # IAED Model definition
         config = init_config(mIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
-                             ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
-                             use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint)
+                             ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
+                             use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint)
         model = mIAED(config = config)
         model.create_model(loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
@@ -193,7 +194,7 @@ if __name__ == "__main__":
         # IAED Model definition
         config = init_config(mT2V_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
-                             use_att = use_att, use_cm = use_cm, cm = CM_FPCMCI, cm_trainable = cm_trainable, use_constraint = use_constraint)
+                             use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint)
         model = mT2VRNN(config = config)
         model.create_model(loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
