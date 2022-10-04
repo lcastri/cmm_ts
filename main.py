@@ -35,7 +35,7 @@ def save_init():
     f.write("# past window steps = " + str(N_PAST) + "\n")
     f.write("# future window steps = " + str(N_FUTURE) + "\n")
     f.write("# delay steps = " + str(N_DELAY) + "\n")
-    f.write("# use encoder state for dec init = " + INITDEC + "\n")
+    f.write("# use encoder state for dec init = " + str(INITDEC) + "\n")
     f.write("# dataset split (train, val, test) = " + str((TRAIN_PERC, VAL_PERC, TEST_PERC)) + "\n")
     
     f.write("#" + "\n")
