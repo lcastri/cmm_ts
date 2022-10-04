@@ -78,8 +78,9 @@ class IAED(Layer):
             self.past_c.assign(tf.expand_dims(c2[-1], -1))
 
             x = concatenate([enc1, enc2])
-            h = concatenate([h1, h2])
-            c = concatenate([c1, c2])
+            if self.config[W_DEC][W_INIT]:
+                h = concatenate([h1, h2])
+                c = concatenate([c1, c2])
         else:
             x, h, c = self.enc(x)
             

@@ -35,6 +35,7 @@ def save_init():
     f.write("# past window steps = " + str(N_PAST) + "\n")
     f.write("# future window steps = " + str(N_FUTURE) + "\n")
     f.write("# delay steps = " + str(N_DELAY) + "\n")
+    f.write("# use encoder state for dec init = " + INITDEC + "\n")
     f.write("# dataset split (train, val, test) = " + str((TRAIN_PERC, VAL_PERC, TEST_PERC)) + "\n")
     
     f.write("#" + "\n")
@@ -68,6 +69,7 @@ def print_init():
     print("# past window steps =", N_PAST)
     print("# future window steps =", N_FUTURE)
     print("# delay steps =", N_DELAY)
+    print("# use encoder state for dec init =", INITDEC)
     print("# dataset split (train, val, test) =", (TRAIN_PERC, VAL_PERC, TEST_PERC))
     
     print("#")
@@ -103,16 +105,13 @@ def create_parser():
     parser.add_argument("--initDEC", action = 'store_true', help = "use ENC final state as init for DEC bit [default False]", required = False, default = False)
     parser.add_argument("--att", action = 'store_true', help = "use attention bit [default False]", required = False, default = False)
     parser.add_argument("--catt", nargs = 3, help = "use causal-attention [CAUSAL MATRIX, TRAINABLE, CONSTRAINT] [default None False None]", required = False, default = [None, False, None])
-    # parser.add_argument("--catt_f", nargs = 2, help = "use causal-attention [FIXED] bit [default False None]", required = False, default = False)
-    # parser.add_argument("--catt_t", nargs = 2, help = "use causal-attention [TRAIN] bit [default False None]", required = False, default = False)
-    # parser.add_argument("--catt_tc", nargs = 3, help = "use causal-attention [TRAIN w/constraint] bit [default False None None]", required = False, default = [False, None])
     parser.add_argument("--target_var", type = str, help = "Target variable to forecast [used only if model = sIAED/sT2V] [default None]", required = False, default = None)
     parser.add_argument("--percs", nargs = 3, action='append', help = "[train, val, test[] percentages [default [0.6, 0.2, 0.2]]", required = False, default = [0.6, 0.2, 0.2])
     parser.add_argument("--patience", type = int, help = "earlystopping patience [default 10]", required = False, default = 10)
     parser.add_argument("--batch_size", type = int, help = "batch size [default 128]", required = False, default = 128)
     parser.add_argument("--epochs", type = int, help = "epochs [default 300]", required = False, default = 300)
     parser.add_argument("--learning_rate", type = float, help = "learning rate [default 0.0001]", required = False, default = 0.0001)
-    parser.add_argument("--adjLR", nargs=3, help = "Modifying learning rate strategy (freq[epochs], factor, justOnce)", required = False)
+    parser.add_argument("--adjLR", nargs = 3, help = "Modifying learning rate strategy (freq[epochs], factor, justOnce)", required = False)
     return parser
 
 
@@ -132,6 +131,7 @@ if __name__ == "__main__":
     N_PAST = args.npast
     N_FUTURE = args.nfuture
     N_DELAY = args.ndelay
+    INITDEC = args.initDEC
     BATCH_SIZE = args.batch_size
     TRAIN_PERC, VAL_PERC, TEST_PERC = args.percs
     PATIENCE = args.patience
@@ -139,7 +139,6 @@ if __name__ == "__main__":
     LR = args.learning_rate
     ADJLR = args.adjLR
     TARGETVAR = args.target_var
-    INITDEC = args.initDEC
 
     use_att, use_cm, cm, cm_trainable, use_constraint, constraint = cmd_attention_map(args.att, args.catt)
     print_init()

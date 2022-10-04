@@ -64,7 +64,7 @@ class sIAED(MyModel):
         return rmse_mean
         
 
-    def predict(self, X, y, scaler):
+    def predict(self, X, y, scaler, plot = False):
         print('\n##')
         print('## Predictions')
         print('##')
@@ -103,4 +103,4 @@ class sIAED(MyModel):
             np.save(file, yp_npy)
 
 
-        self.plot_prediction(x_npy, ya_npy, yp_npy, self.target_var)
+        if plot: self.plot_prediction(x_npy, ya_npy, yp_npy, self.target_var)

@@ -53,7 +53,7 @@ def no_warning():
 
 def cmd_attention_map(att, catt):
     def strTrue(s): return s == 'True'
-    def strNone(s): return s == 'None'
+    def strNone(s): return s == 'None' or s is None
 
     cm = CAUSAL_MODELS[catt[0]] if catt[0] is not None else None
     cm_trainable = strTrue(catt[1])
