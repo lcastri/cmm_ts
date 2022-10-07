@@ -72,8 +72,8 @@ class IAED(Layer):
         enc = x_tilde if self.config[W_SETTINGS][W_USEATT] else x
         for i in range(len(self.config[W_ENC])):
             enc, h, c = self.encs[i](enc)
-        self.past_h.assign(tf.expand_dims(h[0], -1))
-        self.past_c.assign(tf.expand_dims(c[0], -1))
+        self.past_h.assign(tf.expand_dims(h[-1], -1))
+        self.past_c.assign(tf.expand_dims(c[-1], -1))
 
         repeat = self.repeat(enc)
             

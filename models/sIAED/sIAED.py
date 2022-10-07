@@ -60,6 +60,7 @@ class sIAED(MyModel):
         with open(self.model_dir + '/rmse.npy', 'wb') as file:
             np.save(file, rmse_mean)
 
+        self.mean_RMSE(rmse_mean)
         self.plot_RMSE(rmse_mean, show = show)
         return rmse_mean
         

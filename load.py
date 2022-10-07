@@ -1,9 +1,9 @@
 
 from models.sIAED.sIAED import sIAED
+import numpy as np
 
-
-m = sIAED(folder = "sIAED_P20_F150_prova")
-m.RMSE()
+m = sIAED(folder = "PCMCI_encdec256_catt_t_initDEC") #FPCMCI_encdec256_catt_t_initDEC PCMCI_encdec256_catt_t_initDEC
+m.mean_RMSE(np.load(m.model_dir +  "/rmse.npy"))
 
 # model.save_cmatrix()
 

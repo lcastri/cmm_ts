@@ -29,6 +29,8 @@ if __name__ == "__main__":
         else:
             plt.plot(rmse, label = l)
     
+    plt.xlabel("Time steps")
+    plt.ylabel("RMSE")
     if len(rmse) != 1:
         plt.legend()
         plt.grid()

@@ -243,8 +243,8 @@ class MyModel(ABC):
         plt.figure()
         plt.title("Mean RMSE vs time steps")
         plt.plot(range(self.config[W_SETTINGS][W_NFUTURE]), rmse)
+        plt.ylabel("Mean RMSE")
         plt.xlabel("Time steps")
-        plt.xlabel("Mean RMSE")
         plt.grid()
         if show:
             plt.show()
@@ -252,6 +252,11 @@ class MyModel(ABC):
             plt.savefig(self.plot_dir + "/rmse_pred.png", dpi = 300)
             plt.savefig(self.plot_dir + "/rmse_pred.eps", dpi = 300)
         plt.close()
+
+
+    def mean_RMSE(self, rmse):
+        with open(self.model_dir + '/mean_rmse.npy', 'wb') as file:
+            np.save(file, np.mean(rmse))
 
 
     def plot_prediction(self, x, ya, yp, target_var = None):
