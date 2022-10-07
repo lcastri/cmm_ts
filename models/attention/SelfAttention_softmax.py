@@ -26,7 +26,7 @@ class SelfAttention(Layer):
         # Attention weights
         g = self.Dg(x)
         alpha = self.Dalpha(g)
-        if self.config[W_INPUTATT][W_USECAUSAL]: alpha = alpha + self.causal
+        if self.config[W_INPUTATT][W_USECAUSAL]: alpha = Activation('softmax')(alpha + self.causal)
 
         # New state
         x_tilde = tf.math.multiply(x, alpha)
