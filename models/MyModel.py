@@ -187,8 +187,9 @@ class MyModel(ABC):
 
     def save_cmatrix(self):
         if self.config[W_INPUTATT][W_USECAUSAL]:
-            layers = self.model.layers
-            ca_matrix = [layers[l].selfatt.causal.numpy() for l in range(1, len(layers))]
+            layers = self.model.layers          
+            ca_matrix = [layers[l].selfatt.Dalpha.bias.numpy() for l in range(1, len(layers))]
+            # ca_matrix = [layers[l].selfatt.causal.numpy() for l in range(1, len(layers))]
             print(ca_matrix)
             print(self.config[W_INPUTATT][W_CMATRIX])
 

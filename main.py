@@ -102,7 +102,7 @@ def create_parser():
     parser.add_argument("--npast", type = int, help = "observation window", required = True)
     parser.add_argument("--nfuture", type = int, help = "forecasting window", required = True)
     parser.add_argument("--ndelay", type = int, help = "forecasting delay [default 0]", required = False, default = 0)
-    parser.add_argument("--initDEC", action = 'store_true', help = "use ENC final state as init for DEC bit [default False]", required = False, default = False)
+    parser.add_argument("--noinit_dec", action = 'store_false', help = "use ENC final state as init for DEC bit [default True]", required = False, default = True)
     parser.add_argument("--att", action = 'store_true', help = "use attention bit [default False]", required = False, default = False)
     parser.add_argument("--catt", nargs = 3, help = "use causal-attention [CAUSAL MATRIX, TRAINABLE, CONSTRAINT] [default None False None]", required = False, default = [None, False, None])
     parser.add_argument("--target_var", type = str, help = "Target variable to forecast [used only if model = sIAED/sT2V] [default None]", required = False, default = None)
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     N_PAST = args.npast
     N_FUTURE = args.nfuture
     N_DELAY = args.ndelay
-    INITDEC = args.initDEC
+    INITDEC = args.noinit_dec
     BATCH_SIZE = args.batch_size
     TRAIN_PERC, VAL_PERC, TEST_PERC = args.percs
     PATIENCE = args.patience

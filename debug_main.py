@@ -15,7 +15,7 @@ from models.mIAED.mIAED import mIAED
 from models.mIAED.config import config as mIAED_config
 from models.mT2V.mT2VRNN import mT2VRNN
 from models.mT2V.config import config as mT2V_config
-from models.sIAED.sIAED_diffAtt import sIAED
+from models.sIAED.sIAED_cbias import sIAED
 from models.sIAED.config import config as sIAED_config
 from models.sT2V.sT2VRNN import sT2VRNN
 from models.sT2V.config import config as sT2V_config
@@ -36,7 +36,7 @@ N_DELAY = 0
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
-MODEL_FOLDER = "sIAED_F150_P20_catt_f_new"
+MODEL_FOLDER = "PROVA"
 BATCH_SIZE = 128
 
 # # Multi-output data initialization
@@ -72,7 +72,7 @@ X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 # IAED Model definition
 config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                      ndelay = N_DELAY, nfeatures = N_FEATURES, features = features,
-                     use_att = True, use_cm = True, cm = CM_PCMCI, cm_trainable = False)
+                     use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = False)
 model = sIAED(config = config)
 model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
@@ -87,7 +87,7 @@ cb_earlystop = EarlyStopping(patience = 10)
 cb_checkpoints = ModelCheckpoint("training_result/" + MODEL_FOLDER + '/', save_best_only = True)
 # cb_adjLR = AdjLR(model, 150, 0.1, True, 1)
 model.fit(X = X_train, y = y_train, validation_data = (X_val, y_val), batch_size = BATCH_SIZE, 
-          epochs = 1, callbacks = [cb_checkpoints, cb_earlystop]) #, cb_adjLR
+          epochs = 1, callbacks = [cb_checkpoints, cb_earlystop])
 
 model.save_cmatrix()
 

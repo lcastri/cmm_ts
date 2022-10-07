@@ -10,8 +10,8 @@ class SelfAttention(Layer):
         super(SelfAttention, self).__init__(name = name)
         self.causal_vec = causal_vec
         self.config = config
-        self.Dg = Dense(self.config[W_INPUTATT][W_UNITS], activation='tanh', use_bias = True)
-        self.Dalpha = Dense(self.config[W_SETTINGS][W_NFEATURES], activation='sigmoid', use_bias = True) 
+        self.Dg = Dense(self.config[W_INPUTATT][W_UNITS], activation = 'tanh', use_bias = True)
+        self.Dalpha = Dense(self.config[W_SETTINGS][W_NFEATURES], activation = 'sigmoid', use_bias = True) 
         
         if self.config[W_INPUTATT][W_USECAUSAL]:
             constraint = Between(self.causal_vec, self.config[W_INPUTATT][W_TRAINTHRESH]) if self.config[W_INPUTATT][W_CTRAINABLE] and self.config[W_INPUTATT][W_USECONSTRAINT]else None

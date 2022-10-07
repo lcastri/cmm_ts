@@ -15,7 +15,7 @@ from models.mIAED.mIAED import mIAED
 from models.mIAED.config import config as mIAED_config
 from models.mT2V.mT2VRNN import mT2VRNN
 from models.mT2V.config import config as mT2V_config
-from models.sIAED.sIAED_sigmoid import sIAED
+from models.sIAED.sIAED_cbias import sIAED
 from models.sIAED.config import config as sIAED_config
 from models.sT2V.sT2VRNN import sT2VRNN
 from models.sT2V.config import config as sT2V_config

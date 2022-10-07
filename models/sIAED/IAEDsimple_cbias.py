@@ -1,5 +1,5 @@
 import numpy as np
-from models.attention.SelfAttention_sigmoid import SelfAttention
+from models.attention.SelfAttention_cbias import SelfAttention
 from models.attention.InputAttention import InputAttention
 from keras.layers import *
 from keras.models import *
