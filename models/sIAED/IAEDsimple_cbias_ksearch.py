@@ -1,6 +1,6 @@
 import numpy as np
 from constants import CM_FPCMCI
-from models.attention.SelfAttention_cbias import SelfAttention
+from models.attention.SelfAttention_cbias_ksearch import SelfAttention
 from models.attention.InputAttention import InputAttention
 from keras.layers import *
 from keras.models import *
@@ -27,28 +27,28 @@ class IAED(Layer):
             self.inatt = InputAttention(self.config, name = self.target_var + '_inatt')
            
             # Encoders
-            self.selfenc = LSTM(int(self.config["ENCUNITS"]/2), 
+            self.selfenc = LSTM(int(self.config["ENCDECUNITS"]/2), 
                                 name = target_var + '_selfENC',
                                 return_state = True,
                                 input_shape = (self.config[W_NPAST], self.config[W_NFEATURES]))
 
-            self.inenc = LSTM(int(self.config["ENCUNITS"]/2),
+            self.inenc = LSTM(int(self.config["ENCDECUNITS"]/2),
                               name = target_var + '_inENC',
                               return_state = True,
                               input_shape = (self.config[W_NPAST], self.config[W_NFEATURES]))
 
             # Initialization
-            self.past_h = tf.Variable(tf.zeros([int(self.config["ENCUNITS"]/2), 1]), 
+            self.past_h = tf.Variable(tf.zeros([int(self.config["ENCDECUNITS"]/2), 1]), 
                                                 trainable = False, 
-                                                shape = (int(self.config["ENCUNITS"]/2), 1),
+                                                shape = (int(self.config["ENCDECUNITS"]/2), 1),
                                                 name = self.target_var + '_pastH')
-            self.past_c = tf.Variable(tf.zeros([int(self.config["ENCUNITS"]/2), 1]), 
+            self.past_c = tf.Variable(tf.zeros([int(self.config["ENCDECUNITS"]/2), 1]), 
                                                 trainable = False, 
-                                                shape = (int(self.config["ENCUNITS"]/2), 1),
+                                                shape = (int(self.config["ENCDECUNITS"]/2), 1),
                                                 name = self.target_var + '_pastC')
 
         else:
-            self.enc = LSTM(self.config["ENCUNITS"], 
+            self.enc = LSTM(self.config["ENCDECUNITS"], 
                             name = target_var + '_ENC',
                             return_state = True,
                             input_shape = (self.config[W_NPAST], self.config[W_NFEATURES]))
@@ -56,7 +56,7 @@ class IAED(Layer):
         self.repeat = RepeatVector(self.config[W_NFUTURE], name = self.target_var + '_REPEAT')
 
         # Decoder
-        self.dec = LSTM(self.config["DECUNITS"], name = self.target_var + '_DEC')
+        self.dec = LSTM(self.config["ENCDECUNITS"], name = self.target_var + '_DEC')
 
         # Dense
         self.outdense1 = Dense(self.config["D1UNITS"], activation = self.config["D1ACT"], name = self.target_var + '_D')
