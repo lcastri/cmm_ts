@@ -23,11 +23,9 @@ class sIAED(MyModel):
     
         m = Model(inp, x)
         m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
-        # m.compile(loss = loss, optimizer = optimizer, metrics = metrics, run_eagerly = True)
 
         m.summary()
         self.model = m
-        # plot_model(self.model, to_file = self.model_dir + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
         return self.model
 
     def RMSE(self, X, y, scaler, show = False):

@@ -61,25 +61,17 @@ config_grid = {
         W_NFEATURES : N_FEATURES,
         W_FEATURES : features,
         W_USEATT : True,
-
         W_USECAUSAL : True,
-        # W_CMATRIX : CM_FPCMCI,
         W_CTRAINABLE : False,
         W_USECONSTRAINT : False,
         W_TRAINTHRESH : None,
-        "ATTUNITS" : [128, 256, 512],
-
-        "ENCUNITS" : [128, 256],
-
-        "DECUNITS" : [128, 256],
-        "DECINIT" : [False, True],
-
+        "ATTUNITS" : [128, 256, 300],
+        "ENCDECUNITS" : [128, 256],
+        "DECINIT" : [True, False],
         "D1UNITS" : [64, 128, 256],
         "D1ACT" : "relu",
-
         "D2UNITS" : [64, 128, 256],
         "D2ACT" : "relu",
-
         'epochs': 50,
         'batch_size': [128, 256, 512]
 }
