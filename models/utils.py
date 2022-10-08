@@ -2,46 +2,45 @@ import os
 import logging
 import tensorflow as tf
 import absl.logging
-from .words import *
 from constants import *
 from enum import Enum
+import models.Words as Words
 
 class Models(Enum):
     sIAED = "sIAED"
     mIAED = "mIAED"
-    sT2V = "sT2V" 
-    mT2V = "mT2V" 
+
 
 class CausalModel(Enum):
     FPCMCI = "FPCMCI"
     PCMCI = "PCMCI"
 
+
 CAUSAL_MODELS = {CausalModel.FPCMCI.value : CM_FPCMCI,
                  CausalModel.PCMCI.value : CM_PCMCI}
+
 
 MODELS = {
     Models.sIAED.value : "Single-output Input Attention Encoder Decoder",
     Models.mIAED.value : "Multi-output Input Attention Encoder Decoder",
-    Models.sT2V.value : "Single-output Time2Vector LSTM",
-    Models.mT2V.value : "Multi-output Time2Vector LSTM"
 }
 
 
 def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, initDEC = False,
                 use_att = False, use_cm = False, cm = None, cm_trainable = False, use_constraint = False, constraint = None):
-    config[W_SETTINGS][W_FOLDER] = folder
-    config[W_SETTINGS][W_NPAST] = npast
-    config[W_SETTINGS][W_NFUTURE] = nfuture
-    config[W_SETTINGS][W_NDELAY] = ndelay
-    config[W_SETTINGS][W_NFEATURES] = nfeatures
-    config[W_SETTINGS][W_FEATURES] = features
-    config[W_SETTINGS][W_USEATT] = use_att
-    config[W_INPUTATT][W_USECAUSAL] = use_cm
-    config[W_INPUTATT][W_CMATRIX] = cm
-    config[W_INPUTATT][W_CTRAINABLE] = cm_trainable
-    config[W_INPUTATT][W_USECONSTRAINT] = use_constraint
-    config[W_INPUTATT][W_TRAINTHRESH] = constraint
-    config[W_DEC][W_INIT] = initDEC
+    config[Words.FOLDER] = folder
+    config[Words.NPAST] = npast
+    config[Words.NFUTURE] = nfuture
+    config[Words.NDELAY] = ndelay
+    config[Words.NFEATURES] = nfeatures
+    config[Words.FEATURES] = features
+    config[Words.USEATT] = use_att
+    config[Words.USECAUSAL] = use_cm
+    config[Words.CMATRIX] = cm
+    config[Words.CTRAINABLE] = cm_trainable
+    config[Words.USECONSTRAINT] = use_constraint
+    config[Words.TRAINTHRESH] = constraint
+    config[Words.DECINIT] = initDEC
     return config
 
 

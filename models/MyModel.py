@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import os
 from constants import RESULT_DIR
 import models.utils as utils
-from models.words import *
+import models.Words as W
 from keras.models import *
 from matplotlib import pyplot as plt
 import pickle
@@ -22,7 +22,7 @@ class MyModel(ABC):
             folder (str): model's name to load. Default None.
         """
         if config:
-            self.dir = config[W_SETTINGS][W_FOLDER]
+            self.dir = config[W.FOLDER]
             with open(self.model_dir + '/config.pkl', 'wb') as file_pi:
                 pickle.dump(config, file_pi)
 
@@ -99,7 +99,7 @@ class MyModel(ABC):
             predY_t = np.squeeze(predY[t,:,:])
             actualY_t = scaler.inverse_transform(actualY_t)
             predY_t = scaler.inverse_transform(predY_t)
-            rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W_SETTINGS][W_NFUTURE])])
+            rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W.NFUTURE])])
         rmse_mean = np.sum(rmse, axis = 0)/len(y)
 
         with open(self.model_dir + '/rmse.npy', 'wb') as file:
@@ -145,57 +145,15 @@ class MyModel(ABC):
         self.plot_prediction(x_npy, ya_npy, yp_npy)
 
 
-        # # Plot prediction
-        # for f in self.config[W_SETTINGS][W_FEATURES]:
-
-        #     # Create var folder
-        #     if not os.path.exists(self.pred_dir + "/" + str(f) + "/"):
-        #         os.makedirs(self.pred_dir + "/" + str(f) + "/")
-
-        #     f_idx = list(self.config[W_SETTINGS][W_FEATURES]).index(f)
-
-        #     for t in tqdm(range(len(yp_npy)), desc = f):
-        #         # # test X
-        #         # X_t = np.squeeze(X[t,:,:])
-        #         # X_t = scaler.inverse_transform(X_t)
-        #         # x_npy.append(X_t)
-
-        #         # # test y
-        #         # Y_t = np.squeeze(y[t,:,:])
-        #         # Y_t = scaler.inverse_transform(Y_t)
-        #         # ya_npy.append(Y_t)
-
-        #         # # pred y
-        #         # predY_t = np.squeeze(predY[t,:,:])
-        #         # predY_t = scaler.inverse_transform(predY_t)
-        #         # yp_npy.append(predY_t)
-
-        #         plt.plot(range(t, t + len(x_npy[t][:, f_idx])), x_npy[:, f_idx], color = 'green', label = "past")
-        #         plt.plot(range(t - 1 + len(x_npy[t][:, f_idx]), t - 1 + len(x_npy[:, f_idx]) + len(ya_npy[t][:, f_idx])), ya_npy[:, f_idx], color = 'blue', label = "actual")
-        #         plt.plot(range(t - 1 + len(x_npy[t][:, f_idx]), t - 1 + len(x_npy[:, f_idx]) + len(yp_npy[t][:, f_idx])), yp_npy[:, f_idx], color = 'red', label = "pred")
-        #         plt.title("Multi-step prediction - " + f)
-        #         plt.xlabel("step = 0.1s")
-        #         plt.ylabel(f)
-        #         plt.grid()
-        #         plt.legend()
-        #         plt.savefig(self.pred_dir + "/" + str(f) + "/" + str(t) + ".png")
-
-        #         plt.clf()
-                
-        # plt.close()
-
-
     def save_cmatrix(self):
-        if self.config[W_INPUTATT][W_USECAUSAL]:
+        if self.config[W.USECAUSAL]:
             layers = self.model.layers          
             ca_matrix = [layers[l].selfatt.Dalpha.bias.numpy() for l in range(1, len(layers))]
-            # ca_matrix = [layers[l].selfatt.causal.numpy() for l in range(1, len(layers))]
             print(ca_matrix)
-            print(self.config[W_INPUTATT][W_CMATRIX])
+            print(self.config[W.CMATRIX])
 
             with open(self.model_dir + '/cmatrix.npy', 'wb') as file_pi:
                 np.save(file_pi, ca_matrix)
-
 
 
     def plot_history(self, history):       
@@ -243,7 +201,7 @@ class MyModel(ABC):
     def plot_RMSE(self, rmse, show = False):
         plt.figure()
         plt.title("Mean RMSE vs time steps")
-        plt.plot(range(self.config[W_SETTINGS][W_NFUTURE]), rmse)
+        plt.plot(range(self.config[W.NFUTURE]), rmse)
         plt.ylabel("Mean RMSE")
         plt.xlabel("Time steps")
         plt.grid()
@@ -263,13 +221,13 @@ class MyModel(ABC):
     def plot_prediction(self, x, ya, yp, target_var = None):
         plt.figure()
         if target_var is None:
-            for f in self.config[W_SETTINGS][W_FEATURES]:
+            for f in self.config[W.FEATURES]:
 
                 # Create var folder
                 if not os.path.exists(self.pred_dir + "/" + str(f) + "/"):
                     os.makedirs(self.pred_dir + "/" + str(f) + "/")
 
-                f_idx = list(self.config[W_SETTINGS][W_FEATURES]).index(f)
+                f_idx = list(self.config[W.FEATURES]).index(f)
 
                 for t in tqdm(range(len(yp)), desc = f):
                     plt.plot(range(t, t + len(x[t][:, f_idx])), x[:, f_idx], color = 'green', label = "past")
@@ -288,7 +246,7 @@ class MyModel(ABC):
             if not os.path.exists(self.pred_dir + "/" + str(target_var) + "/"):
                 os.makedirs(self.pred_dir + "/" + str(target_var) + "/")
 
-            f_idx = list(self.config[W_SETTINGS][W_FEATURES]).index(target_var)
+            f_idx = list(self.config[W.FEATURES]).index(target_var)
 
             for t in tqdm(range(len(yp)), desc = target_var):
                 plt.plot(range(t, t + len(x[t][:, f_idx])), x[t][:, f_idx], color = 'green', label = "past")

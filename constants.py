@@ -1,5 +1,4 @@
 import numpy as np
-from models.words import *
 import os
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))

@@ -2,8 +2,8 @@ from keras.layers import *
 from keras.models import *
 from keras.utils.vis_utils import plot_model
 from models.MyModel import MyModel
-from .IAEDsimple import IAED
-from models.words import *
+from .IAED import IAED
+import models.Words as W
 from tqdm import tqdm
 import numpy as np
 from math import sqrt
@@ -15,19 +15,19 @@ class sIAED(MyModel):
         super().__init__(config = config, folder = folder)
                
 
-    def create_model(self, target_var, loss, optimizer, metrics):
+    def create_model(self, target_var, loss, optimizer, metrics, searchBest = False):
         self.target_var = target_var
 
-        inp = Input(shape = (self.config[W_SETTINGS][W_NPAST], self.config[W_SETTINGS][W_NFEATURES]))
-        x = IAED(self.config, target_var, name = target_var + "_IAED")(inp)
+        inp = Input(shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+        x = IAED(self.config, target_var, name = target_var + "_IAED", searchBest = searchBest)(inp)
     
         m = Model(inp, x)
-        # m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
-        m.compile(loss = loss, optimizer = optimizer, metrics = metrics, run_eagerly = True)
+        m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
 
         m.summary()
         self.model = m
-        plot_model(self.model, to_file = self.model_dir + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
+        # plot_model(self.model, to_file = self.model_dir + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
+        return self.model
 
 
     def RMSE(self, X, y, scaler, show = False):
@@ -35,7 +35,7 @@ class sIAED(MyModel):
         print('## Prediction evaluation through RMSE')
         print('##')
 
-        t_idx = self.config[W_SETTINGS][W_FEATURES].index(self.target_var)
+        t_idx = self.config[W.FEATURES].index(self.target_var)
         dummy_y = np.zeros(shape = (y.shape[1], 8))
         
         predY = self.model.predict(X)
@@ -54,13 +54,12 @@ class sIAED(MyModel):
             predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
             predY_t = np.reshape(predY_t, (predY_t.shape[0], 1))
 
-            rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W_SETTINGS][W_NFUTURE])])
+            rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W.NFUTURE])])
         rmse_mean = np.sum(rmse, axis=0)/len(y)
 
         with open(self.model_dir + '/rmse.npy', 'wb') as file:
             np.save(file, rmse_mean)
 
-        self.mean_RMSE(rmse_mean)
         self.plot_RMSE(rmse_mean, show = show)
         return rmse_mean
         
@@ -73,7 +72,7 @@ class sIAED(MyModel):
         ya_npy = list()
         yp_npy = list()
 
-        t_idx = self.config[W_SETTINGS][W_FEATURES].index(self.target_var)
+        t_idx = self.config[W.FEATURES].index(self.target_var)
         dummy_y = np.zeros(shape = (y.shape[1], 8))
 
         predY = self.model.predict(X)

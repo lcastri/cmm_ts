@@ -1,44 +1,23 @@
-from models.words import *
+from models.utils import Words as W
 
 
 config = {
-
-    W_SETTINGS : {
-        W_FOLDER : None,
-        W_NPAST : None,
-        W_NFUTURE : None,
-        W_NDELAY : None,
-        W_NFEATURES : None,
-        W_FEATURES : None,
-        W_USEATT : False
-    },
-
-    W_INPUTATT : {
-        W_USECAUSAL : False,
-        W_CMATRIX : None,
-        W_CTRAINABLE : False,
-        W_USECONSTRAINT : False,
-        W_TRAINTHRESH : 0.2
-    },
-
-    W_ENC : [
-        {W_UNITS : 64,
-         W_RSEQ : False,
-         W_RSTATE : True},
-        ],
-
-    W_DEC : [
-        {W_UNITS : 64,
-         W_RSEQ : False,
-         W_RSTATE : False},
-        ],
-
-    W_OUT : [
-        {W_UNITS : 64,
-         W_DROPOUT : None,
-         W_ACT : "relu"},
-        {W_UNITS : 32,
-         W_DROPOUT : None,
-         W_ACT : "relu"}
-    ]
+    W.FOLDER : None,
+    W.NPAST : None,
+    W.NFUTURE : None,
+    W.NDELAY : None,
+    W.NFEATURES : None,
+    W.FEATURES : None,
+    W.USEATT : False,
+    W.USECAUSAL : False,
+    W.CTRAINABLE : None,
+    W.USECONSTRAINT : False,
+    W.TRAINTHRESH : None,
+    W.ATTUNITS : 128,
+    W.ENCDECUNITS : 128,
+    W.DECINIT : False,
+    W.D1UNITS : 64,
+    W.D1ACT : "relu",
+    W.D2UNITS : 32,
+    W.D2ACT : "relu",
 }

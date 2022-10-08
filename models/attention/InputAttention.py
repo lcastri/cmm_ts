@@ -1,7 +1,6 @@
 import tensorflow as tf
 import keras.backend as K
 from keras.layers import *
-from models.words import *
 
 
 class InputAttention(Layer):
