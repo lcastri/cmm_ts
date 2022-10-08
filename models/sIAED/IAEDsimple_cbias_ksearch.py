@@ -18,7 +18,7 @@ class IAED(Layer):
         if self.config[W_USEATT]:
 
             # Causal vector definition
-            causal_vec = np.array(CM_FPCMCI[self.config[W_FEATURES].index(self.target_var), :]) if self.config[W_USECAUSAL] else None
+            causal_vec = CM_FPCMCI[0, :]
             
             # Self attention
             self.selfatt = SelfAttention(self.config, causal_vec, name = self.target_var + '_selfatt')
