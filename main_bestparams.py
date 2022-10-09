@@ -10,11 +10,9 @@ from kerashypetune import KerasGridSearch
 from models.utils import Words as W
 
 # Models import
-from models.mIAED.mIAED import mIAED
-from models.mIAED.config import config as mIAED_config
-from models.sIAED.sIAED import sIAED
-from models.sIAED.config import config as sIAED_config
-
+from models.mIAED import mIAED
+from models.sIAED import sIAED
+from models.config import config 
 
 # load csv and remove NaNs
 csv_path = ROOT_DIR + "/data/training/agent_11_aug.csv"
@@ -42,23 +40,16 @@ if MODEL == Models.sIAED.value:
         X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 
         # IAED Model definition
-        config_grid = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+        config_grid = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                                   ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = False,
                                   use_att = True, use_cm = True, cm = None, cm_trainable = True, use_constraint = True, constraint = 0.2)
-        config_grid[W.ATTUNITS] = 128
-        config_grid[W.ENCDECUNITS] = 128
-        config_grid[W.DECINIT] = True
-        config_grid[W.D1UNITS] = [64, 128]
-        config_grid[W.D2UNITS] = [32, 64]
-        config_grid["epochs"] = 5
-        config_grid["batch_size"] = [64, 128]
-        # config_grid[W.ATTUNITS] = [128, 256, 300]
-        # config_grid[W.ENCDECUNITS] = [128, 256]
-        # config_grid[W.DECINIT] = [False, True]
-        # config_grid[W.D1UNITS] = [64, 128, 256]
-        # config_grid[W.D2UNITS] = [64, 128]
-        # config_grid["epochs"] = 50
-        # config_grid["batch_size"] = [64, 128, 256]
+        config_grid[W.ATTUNITS] = [128, 256, 300]
+        config_grid[W.ENCDECUNITS] = [128, 256]
+        config_grid[W.DECINIT] = [False, True]
+        config_grid[W.D1UNITS] = [64, 128, 256]
+        config_grid[W.D2UNITS] = [64, 128]
+        config_grid["epochs"] = 50
+        config_grid["batch_size"] = [64, 128, 256]
 
         hypermodel = lambda x: sIAED(config = x).create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), 
                                                               metrics = ['mse', 'mae', 'mape'], searchBest = True)
@@ -70,7 +61,7 @@ elif MODEL == Models.mIAED.value:
         X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 
         # IAED Model definition
-        config_grid = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+        config_grid = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                                   ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = False,
                                   use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
         config_grid[W.ATTUNITS] = [128, 256, 300]

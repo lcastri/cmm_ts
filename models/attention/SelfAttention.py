@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from keras.layers import *
-from models.Constraint import Between
+from models.Constraints import *
 import models.Words as W
 import keras.backend as K
 
@@ -12,7 +12,12 @@ class SelfAttention(Layer):
         self.causal_vec = causal_vec
         self.Dg = Dense(self.config[W.ATTUNITS], activation = 'tanh', use_bias = True)
         if self.config[W.USECAUSAL]:
-            constraint = Between(self.causal_vec, self.config[W.TRAINTHRESH]) if self.config[W.CTRAINABLE] and self.config[W.USECONSTRAINT]else None
+            if not self.config[W.CTRAINABLE]:
+                constraint = Constant(self.causal_vec)
+            elif self.config[W.CTRAINABLE] and not self.config[W.USECONSTRAINT]:
+                constraint = None
+            elif self.config[W.CTRAINABLE] and self.config[W.USECONSTRAINT]:
+                constraint = Between(self.causal_vec, self.config[W.TRAINTHRESH])
             self.Dalpha = Dense(self.config[W.NFEATURES], activation = 'sigmoid',
                                 use_bias = True,
                                 bias_initializer = tf.initializers.Constant(self.causal_vec),

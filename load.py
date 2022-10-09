@@ -1,5 +1,5 @@
 
-from models.sIAED.sIAED import sIAED
+from models.sIAED import sIAED
 import numpy as np
 
 m = sIAED(folder = "PCMCI_encdec256_catt_t_initDEC") #FPCMCI_encdec256_catt_t_initDEC PCMCI_encdec256_catt_t_initDEC

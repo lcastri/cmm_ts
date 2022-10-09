@@ -9,10 +9,9 @@ from constants import *
 import pandas as pd
 
 # Models import
-from models.mIAED.mIAED import mIAED
-from models.mIAED.config import config as mIAED_config
-from models.sIAED.sIAED import sIAED
-from models.sIAED.config import config as sIAED_config
+from models.mIAED import mIAED
+from models.sIAED import sIAED
+from models.config import config
 from MyParser import *
 
 
@@ -51,7 +50,7 @@ if __name__ == "__main__":
         X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 
         # IAED Model definition
-        config = init_config(sIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+        config = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
         model = sIAED(config = config)
@@ -65,7 +64,7 @@ if __name__ == "__main__":
         X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 
         # IAED Model definition
-        config = init_config(mIAED_config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+        config = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint)
         model = mIAED(config = config)
