@@ -1,6 +1,7 @@
 from keras.layers import *
 from keras.models import *
 from keras.utils.vis_utils import plot_model
+from models.utils import Models
 from .MyModel import MyModel
 from .IAED import IAED
 import models.Words as W
@@ -12,7 +13,7 @@ from sklearn.metrics import mean_squared_error
 
 class sIAED(MyModel):
     def __init__(self, config : dict = None, folder : str = None):
-        super().__init__(config = config, folder = folder)
+        super().__init__(name = Models.sIAED, config = config, folder = folder)
                
 
     def create_model(self, target_var, loss, optimizer, metrics, searchBest = False):

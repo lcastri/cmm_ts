@@ -3,12 +3,13 @@ from keras.models import *
 from keras.utils.vis_utils import plot_model
 from models.MyModel import MyModel
 from .IAED import IAED
-from models.utils import Words as W
+from models.utils import Models 
+import models.Words as W
 
 
 class mIAED(MyModel):
     def __init__(self, config : dict = None, folder : str = None):
-        super().__init__(config = config, folder = folder)        
+        super().__init__(name = Models.mIAED, config = config, folder = folder)        
 
 
     def create_model(self, loss, optimizer, metrics) -> Model:

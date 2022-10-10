@@ -13,7 +13,7 @@ from sklearn.metrics import mean_squared_error
 
 
 class MyModel(ABC):
-    def __init__(self, config : dict = None, folder : str = None):
+    def __init__(self, name, config : dict = None, folder : str = None):
         """
         Constructur, specify config if you want to create a new model, while, set folder if you want to load a pre-existing model
 
@@ -21,6 +21,7 @@ class MyModel(ABC):
             config (dict): configuration file. Default None.
             folder (str): model's name to load. Default None.
         """
+        self.name = name
         if config:
             self.dir = config[W.FOLDER]
             with open(self.model_dir + '/config.pkl', 'wb') as file_pi:
@@ -148,7 +149,10 @@ class MyModel(ABC):
     def save_cmatrix(self):
         if self.config[W.USECAUSAL]:
             layers = self.model.layers          
-            ca_matrix = [layers[l].selfatt.Dalpha.bias.numpy() for l in range(1, len(layers))]
+            if self.name == utils.Models.mIAED:
+                ca_matrix = [layers[l].selfatt.Dalpha.bias.numpy() for l in range(1, len(layers) - 1)]
+            else:
+                ca_matrix = [layers[l].selfatt.Dalpha.bias.numpy() for l in range(1, len(layers))]
             print(ca_matrix)
             print(self.config[W.CMATRIX])
 
