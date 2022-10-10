@@ -25,7 +25,7 @@ def plot_prediction(x, y, yp_dict : dict):
         os.makedirs(pred_dir + TARGET)
 
     for t in tqdm(range(len(yp_dict[list(yp_dict.keys())[0]])), desc = TARGETIDX):
-        plt.plot(range(t, t + len(x[t][:, TARGETIDX])), x[t][:, TARGETIDX], color = 'peru', label = "past")
+        plt.plot(range(t, t + len(x[t][:, TARGETIDX])), x[t][:, TARGETIDX], color = 'darkviolet', label = "past")
         plt.plot(range(t - 1 + len(x[t][:, TARGETIDX]), t - 1 + len(x[t][:, TARGETIDX]) + len(y[t])), y[t], color = 'black', label = "actual")
         for k in yp_dict.keys():
             plt.plot(range(t - 1 + len(x[t][:, TARGETIDX]), t - 1 + len(x[t][:, TARGETIDX]) + len(yp_dict[k][t])), yp_dict[k][t], label = k)

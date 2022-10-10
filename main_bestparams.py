@@ -41,15 +41,15 @@ if MODEL == Models.sIAED.value:
 
         # IAED Model definition
         config_grid = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
-                                  ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = False,
+                                  ndelay = N_DELAY, nfeatures = N_FEATURES, features = None, initDEC = False,
                                   use_att = True, use_cm = True, cm = None, cm_trainable = True, use_constraint = True, constraint = 0.2)
         config_grid[W.ATTUNITS] = [128, 256, 300]
         config_grid[W.ENCDECUNITS] = [128, 256]
         config_grid[W.DECINIT] = [False, True]
         config_grid[W.D1UNITS] = [64, 128, 256]
-        config_grid[W.D2UNITS] = [64, 128]
-        config_grid["epochs"] = 50
-        config_grid["batch_size"] = [64, 128, 256]
+        config_grid[W.D2UNITS] = [32, 64, 128]
+        config_grid["epochs"] = 30
+        config_grid["batch_size"] = [64, 128]
 
         hypermodel = lambda x: sIAED(config = x).create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), 
                                                               metrics = ['mse', 'mae', 'mape'], searchBest = True)

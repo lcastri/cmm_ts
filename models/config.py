@@ -14,7 +14,7 @@ config = {
     W.USECONSTRAINT : False,
     W.TRAINTHRESH : None,
     W.ATTUNITS : 256,
-    W.ENCDECUNITS : 64,
+    W.ENCDECUNITS : 256,
     W.DECINIT : False,
     W.D1UNITS : 256,
     W.D1ACT : "relu",
