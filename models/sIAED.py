@@ -16,7 +16,7 @@ class sIAED(MyModel):
         super().__init__(name = Models.sIAED, config = config, folder = folder)
                
 
-    def create_model(self, target_var, loss, optimizer, metrics, searchBest = False):
+    def create_model(self, target_var, loss, optimizer, metrics, searchBest = False) -> Model:
         self.target_var = target_var
 
         inp = Input(shape = (self.config[W.NPAST], self.config[W.NFEATURES]))

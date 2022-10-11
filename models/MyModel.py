@@ -110,7 +110,7 @@ class MyModel(ABC):
         return rmse
 
 
-    def predict(self, X, y, scaler):
+    def predict(self, X, y, scaler, plot = False):
         print('\n##')
         print('## Predictions')
         print('##')
@@ -143,7 +143,7 @@ class MyModel(ABC):
         with open(self.pred_dir + '/yp_npy.npy', 'wb') as file:
             np.save(file, yp_npy)
 
-        self.plot_prediction(x_npy, ya_npy, yp_npy)
+        if plot: self.plot_prediction(x_npy, ya_npy, yp_npy)
 
 
     def save_cmatrix(self):

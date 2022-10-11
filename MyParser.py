@@ -55,7 +55,7 @@ def print_init(model, targetvar, modeldir, npast, nfuture, ndelay, initdec, trai
     f.write("# ATTENTION PARAMETERS" + "\n")
     f.write("# attention = " + str(use_att) + "\n")
     if use_att and use_cm and cm_trainable:
-        f.write("# trainable causal model = " + cm + "\n")
+        f.write("# trainable causal model = " + str(cm) + "\n")
         if use_constraint:
             f.write("# contraint = " + str(constraint) + "\n")
 

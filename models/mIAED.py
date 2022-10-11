@@ -12,13 +12,13 @@ class mIAED(MyModel):
         super().__init__(name = Models.mIAED, config = config, folder = folder)        
 
 
-    def create_model(self, loss, optimizer, metrics) -> Model:
+    def create_model(self, loss, optimizer, metrics, searchBest = False) -> Model:
         inp = Input(shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
         
         # Multihead
         channels = list()
         for var in self.config[W.FEATURES]:
-            channels.append(IAED(self.config, var, name = var + "_IAED")(inp))
+            channels.append(IAED(self.config, var, name = var + "_IAED", searchBest = searchBest)(inp))
 
         # Concatenation
         y = concatenate(channels, axis = 2)

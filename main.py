@@ -41,7 +41,6 @@ if __name__ == "__main__":
     TARGETVAR = args.target_var
 
     use_att, use_cm, cm, cm_trainable, use_constraint, constraint = cmd_attention_map(args.att, args.catt)
-
     if MODEL == Models.sIAED.value:
         if TARGETVAR == None: raise ValueError('for models sIAED, target_var needs to be specified')
         # Single-output data initialization
@@ -66,7 +65,7 @@ if __name__ == "__main__":
         # IAED Model definition
         config = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
-                             use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint)
+                             use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
         model = mIAED(config = config)
         model.create_model(loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
@@ -89,4 +88,4 @@ if __name__ == "__main__":
     model.RMSE(x_test, y_test, d.scaler)
 
     # Model predictions
-    model.predict(x_test, y_test, d.scaler, plot = True)
+    model.predict(x_test, y_test, d.scaler)
