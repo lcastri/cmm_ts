@@ -79,6 +79,8 @@ def create_parser():
     parser = argparse.ArgumentParser(description = 'Multivariate Multistep Timeseries forecasting framework.', formatter_class = RawTextHelpFormatter)
     parser.add_argument("model", type = str, choices = list(MODELS.keys()), help = model_description)
     parser.add_argument("model_dir", type = str, help = "model folder")
+    parser.add_argument("--train_agent", type = int, choices = list(range(3, 12)), help = "agent training data", required = True)
+    parser.add_argument("--test_agent", nargs = '+', choices = list(range(3, 12)), help = "agent training data", required = False)
     parser.add_argument("--npast", type = int, help = "observation window", required = True)
     parser.add_argument("--nfuture", type = int, help = "forecasting window", required = True)
     parser.add_argument("--ndelay", type = int, help = "forecasting delay [default 0]", required = False, default = 0)

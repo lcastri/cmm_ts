@@ -6,7 +6,6 @@ from Data import Data
 from keras.layers import *
 from keras.models import *
 from constants import *
-import pandas as pd
 
 # Models import
 from models.mIAED import mIAED
@@ -15,12 +14,14 @@ from models.config import config
 os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 
 
-# load csv and remove NaNs
-csv_path = ROOT_DIR + "/data/training/agent_11_aug.csv"
-df = pd.read_csv(csv_path)
-df.fillna(method="ffill", inplace = True)
-df.fillna(method="bfill", inplace = True)
-features = list(df.columns)
+# # load csv and remove NaNs
+# csv_path = ROOT_DIR + "/data/training/agent_11_aug.csv"
+# df = pd.read_csv(csv_path)
+# df.fillna(method="ffill", inplace = True)
+# df.fillna(method="bfill", inplace = True)
+# features = list(df.columns)
+
+df, features = get_df(3)
 
 # Parameters definition
 MODEL = Models.mIAED.value

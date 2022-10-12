@@ -1,3 +1,4 @@
+import glob
 import os 
 import logging
 import tensorflow as tf
@@ -5,6 +6,9 @@ import absl.logging
 from constants import *
 from enum import Enum
 import models.Words as Words
+import pandas as pd
+from natsort import natsorted
+
 
 class Models(Enum):
     sIAED = "sIAED"
@@ -64,3 +68,16 @@ def cmd_attention_map(att, catt):
     use_att = att or use_cm
 
     return use_att, use_cm, cm, cm_trainable, use_constraint, constraint
+
+
+def get_df(agent):
+    # load csv and remove NaNs
+    csv_path = ROOT_DIR + "/data/" + str(agent) + "/"
+
+    all_files = natsorted(glob.glob(os.path.join(csv_path, "*.csv")))
+    df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index = True)
+
+    df.fillna(method="ffill", inplace = True)
+    df.fillna(method="bfill", inplace = True)
+    features = list(df.columns)
+    return df, features

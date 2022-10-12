@@ -34,7 +34,7 @@ if __name__ == "__main__":
     LR = args.learning_rate
     ADJLR = args.adjLR
     TARGETVAR = args.target_var
-
+    
     df, features = get_df(TRAIN_AGENT)
 
     use_att, use_cm, cm, cm_trainable, use_constraint, constraint = cmd_attention_map(args.att, args.catt)
@@ -81,6 +81,8 @@ if __name__ == "__main__":
     # Save causal matrix
     model.save_cmatrix()
 
+    
+    
     # Model evaluation
     model.RMSE(X_test, y_test, d.scaler)
 
