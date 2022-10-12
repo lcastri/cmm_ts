@@ -14,12 +14,8 @@ from models.mIAED import mIAED
 from models.sIAED import sIAED
 from models.config import config 
 
-# load csv and remove NaNs
-csv_path = ROOT_DIR + "/data/training/agent_11_aug.csv"
-df = pd.read_csv(csv_path)
-df.fillna(method = "ffill", inplace = True)
-df.fillna(method = "bfill", inplace = True)
-features = list(df.columns)
+
+df, features = get_df(11)
 
 # Parameters definition
 MODEL = Models.sIAED.value
@@ -36,6 +32,7 @@ if MODEL == Models.sIAED.value:
         # Single-output data initialization
         TARGETVAR = 'd_g'
         d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = TARGETVAR)
+        d.augment()
         d.downsample(10)
         X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 
@@ -57,6 +54,7 @@ if MODEL == Models.sIAED.value:
 elif MODEL == Models.mIAED.value:
         # Multi-output data initialization
         d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC)
+        d.augment()
         d.downsample(10)
         X_train, y_train, X_val, y_val, x_test, y_test = d.get_timeseries()
 

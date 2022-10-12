@@ -42,6 +42,7 @@ if __name__ == "__main__":
         if TARGETVAR == None: raise ValueError('for models sIAED, target_var needs to be specified')
         # Single-output data initialization
         d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = TARGETVAR)
+        d.augment()
         d.downsample(10)
         X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
@@ -56,6 +57,7 @@ if __name__ == "__main__":
     elif MODEL == Models.mIAED.value:
         # Multi-output data initialization
         d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC)
+        d.augment()
         d.downsample(10)
         X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
