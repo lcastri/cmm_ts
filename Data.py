@@ -2,6 +2,7 @@ from copy import deepcopy
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
+from matplotlib import pyplot as plt 
 
 ALL = 'all'
 
@@ -55,6 +56,8 @@ class Data():
             nrepeat (int, optional): Number of concatenation of the same dataset. Defaults to 5.
             sigma (float, optional): Gaussian noise sigma to apply to each repetition. Defaults to 0.1.
         """
+        np.random.seed(0)
+
         list_d = list()
         for _ in range(nrepeat):
             d = deepcopy(self.data)
@@ -64,6 +67,13 @@ class Data():
             rep['g_seq'] = self.data['g_seq']
             list_d.append(rep)
         self.data = pd.concat(list_d, ignore_index = True)
+
+    
+    def plot_ts(self):
+        self.data.plot(subplots=True)
+
+        plt.tight_layout()
+        plt.show()
 
     
     def scale_data(self):
