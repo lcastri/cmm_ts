@@ -22,7 +22,6 @@ if __name__ == "__main__":
     MODEL = args.model
     MODEL_FOLDER = args.model_dir
     TRAIN_AGENT = args.train_agent
-    TEST_AGENT = args.test_agent
     N_PAST = args.npast
     N_FUTURE = args.nfuture
     N_DELAY = args.ndelay

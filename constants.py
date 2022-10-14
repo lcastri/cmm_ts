@@ -6,6 +6,8 @@ RESULT_DIR = ROOT_DIR + "/training_result"
 
 # Parameters definition
 N_FEATURES = 8
+LIST_FEATURES = ['d_g', 'v', 'risk', 'theta_g', 'omega', 'theta', 'g_seq', 'd_obs']
+
 
 CM_PCMCI = np.array([[0.632,0.065,0.125,0.088,0.138,0.108,0.06,0.048], 
                      [0.078,0.274,0.092,0.094,0.103,0.08,0.068,0.049], 

@@ -18,7 +18,7 @@ from models.config import config
 df, features = get_df(11)
 
 # Parameters definition
-MODEL = Models.sIAED.value
+MODEL = Models.mIAED.value
 N_FUTURE = 150
 N_PAST = 20
 N_DELAY = 0
@@ -39,14 +39,14 @@ if MODEL == Models.sIAED.value:
         # IAED Model definition
         config_grid = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                                   ndelay = N_DELAY, nfeatures = N_FEATURES, features = None, initDEC = False,
-                                  use_att = True, use_cm = True, cm = None, cm_trainable = True, use_constraint = True, constraint = 0.2)
-        config_grid[W.ATTUNITS] = [128, 256, 300]
+                                  use_att = True, use_cm = True, cm = None, cm_trainable = True, use_constraint = True, constraint = [0.1, 0.2])
+        config_grid[W.ATTUNITS] = [256, 300, 512]
         config_grid[W.ENCDECUNITS] = [128, 256]
         config_grid[W.DECINIT] = [False, True]
-        config_grid[W.D1UNITS] = [64, 128, 256]
-        config_grid[W.D2UNITS] = [32, 64, 128]
-        config_grid["epochs"] = 30
-        config_grid["batch_size"] = [64, 128]
+        config_grid[W.D1UNITS] = [128, 256]
+        config_grid[W.D2UNITS] = [64, 128]
+        config_grid["epochs"] = 25
+        config_grid["batch_size"] = [64, 128, 256, 512]
 
         hypermodel = lambda x: sIAED(config = x).create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), 
                                                               metrics = ['mse', 'mae', 'mape'], searchBest = True)
@@ -60,15 +60,15 @@ elif MODEL == Models.mIAED.value:
 
         # IAED Model definition
         config_grid = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
-                                  ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = False,
-                                  use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
-        config_grid[W.ATTUNITS] = [128, 256, 300]
+                                  ndelay = N_DELAY, nfeatures = N_FEATURES, features = None, initDEC = False,
+                                  use_att = True, use_cm = True, cm = None, cm_trainable = True, use_constraint = True, constraint = [0.1, 0.2])
+        config_grid[W.ATTUNITS] = [256, 300, 512]
         config_grid[W.ENCDECUNITS] = [128, 256]
         config_grid[W.DECINIT] = [False, True]
         config_grid[W.D1UNITS] = [128, 256]
         config_grid[W.D2UNITS] = [64, 128]
-        config_grid["epochs"] = 50
-        config_grid["batch_size"] = [128, 256, 512]
+        config_grid["epochs"] = 25
+        config_grid["batch_size"] = [64, 128, 256, 512]
 
         hypermodel = lambda x: mIAED(config = x).create_model(loss = 'mse', optimizer = Adam(0.0001),
                                                               metrics = ['mse', 'mae', 'mape'], searchBest = True)

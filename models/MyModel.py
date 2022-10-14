@@ -22,6 +22,7 @@ class MyModel(ABC):
             folder (str): model's name to load. Default None.
         """
         self.name = name
+        self.predY = None
         if config:
             self.dir = config[W.FOLDER]
             with open(self.model_dir + '/config.pkl', 'wb') as file_pi:
@@ -88,39 +89,48 @@ class MyModel(ABC):
         self.plot_history(history)
 
 
-    def RMSE(self, X, y, scaler, show = False):
+    def RMSE(self, X, y, scaler, folder = None, show = False):
         print('\n##')
         print('## Prediction evaluation through RMSE')
         print('##')
+        if folder is None: 
+            folder = self.model_dir
+        else:
+            if not os.path.exists(folder): os.makedirs(folder)
 
-        predY = self.model.predict(X)
+        if self.predY is None: self.predY = self.model.predict(X)
         rmse = np.zeros(shape = (1, y.shape[1]))
         for t in tqdm(range(len(y)), desc = 'RMSE'):
             actualY_t = np.squeeze(y[t,:,:])
-            predY_t = np.squeeze(predY[t,:,:])
+            predY_t = np.squeeze(self.predY[t,:,:])
             actualY_t = scaler.inverse_transform(actualY_t)
             predY_t = scaler.inverse_transform(predY_t)
             rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W.NFUTURE])])
         rmse_mean = np.sum(rmse, axis = 0)/len(y)
 
-        with open(self.model_dir + '/rmse.npy', 'wb') as file:
+        with open(folder + '/rmse.npy', 'wb') as file:
             np.save(file, rmse_mean)
 
-        self.plot_RMSE(rmse_mean, show = show)
+        self.plot_RMSE(rmse_mean, folder = folder, show = show)
         return rmse
 
 
-    def predict(self, X, y, scaler, plot = False):
+    def predict(self, X, y, scaler, folder = None, plot = False):
         print('\n##')
         print('## Predictions')
         print('##')
+        if folder is None: 
+            folder = self.pred_dir
+        else:
+            if not os.path.exists(folder): os.makedirs(folder)
+
         x_npy = list()
         ya_npy = list()
         yp_npy = list()
 
         # Generate and save predictions
-        predY = self.model.predict(X)
-        for t in range(len(predY)):
+        if self.predY is None: self.predY = self.model.predict(X)
+        for t in range(len(self.predY)):
             # test X
             X_t = np.squeeze(X[t,:,:])
             X_t = scaler.inverse_transform(X_t)
@@ -132,18 +142,18 @@ class MyModel(ABC):
             ya_npy.append(Y_t)
 
             # pred y
-            predY_t = np.squeeze(predY[t,:,:])
+            predY_t = np.squeeze(self.predY[t,:,:])
             predY_t = scaler.inverse_transform(predY_t)
             yp_npy.append(predY_t)
             
-        with open(self.pred_dir + '/x_npy.npy', 'wb') as file:
+        with open(folder + '/x_npy.npy', 'wb') as file:
             np.save(file, x_npy)
-        with open(self.pred_dir + '/ya_npy.npy', 'wb') as file:
+        with open(folder + '/ya_npy.npy', 'wb') as file:
             np.save(file, ya_npy)
-        with open(self.pred_dir + '/yp_npy.npy', 'wb') as file:
+        with open(folder + '/yp_npy.npy', 'wb') as file:
             np.save(file, yp_npy)
 
-        if plot: self.plot_prediction(x_npy, ya_npy, yp_npy)
+        if plot: self.plot_prediction(x_npy, ya_npy, yp_npy, folder = folder)
 
 
     def save_cmatrix(self):
@@ -202,7 +212,7 @@ class MyModel(ABC):
             plt.close()
 
 
-    def plot_RMSE(self, rmse, show = False):
+    def plot_RMSE(self, rmse, folder = None, show = False):
         plt.figure()
         plt.title("Mean RMSE vs time steps")
         plt.plot(range(self.config[W.NFUTURE]), rmse)
@@ -212,24 +222,27 @@ class MyModel(ABC):
         if show:
             plt.show()
         else:
-            plt.savefig(self.plot_dir + "/rmse_pred.png", dpi = 300)
-            plt.savefig(self.plot_dir + "/rmse_pred.eps", dpi = 300)
+            if folder is None: folder = self.plot_dir
+            plt.savefig(folder + "/rmse_pred.png", dpi = 300)
+            plt.savefig(folder + "/rmse_pred.eps", dpi = 300)
         plt.close()
 
 
-    def mean_RMSE(self, rmse):
-        with open(self.model_dir + '/mean_rmse.npy', 'wb') as file:
+    def mean_RMSE(self, rmse, folder = None):
+        if folder is None: folder = self.model_dir
+        with open(folder + '/mean_rmse.npy', 'wb') as file:
             np.save(file, np.mean(rmse))
 
 
-    def plot_prediction(self, x, ya, yp, target_var = None):
+    def plot_prediction(self, x, ya, yp, folder = None, target_var = None):
+        if folder is None: folder = self.pred_dir
         plt.figure()
         if target_var is None:
             for f in self.config[W.FEATURES]:
 
                 # Create var folder
-                if not os.path.exists(self.pred_dir + "/" + str(f) + "/"):
-                    os.makedirs(self.pred_dir + "/" + str(f) + "/")
+                if not os.path.exists(folder + "/" + str(f) + "/"):
+                    os.makedirs(folder + "/" + str(f) + "/")
 
                 f_idx = list(self.config[W.FEATURES]).index(f)
 
@@ -242,13 +255,13 @@ class MyModel(ABC):
                     plt.ylabel(f)
                     plt.grid()
                     plt.legend()
-                    plt.savefig(self.pred_dir + "/" + str(f) + "/" + str(t) + ".png")
+                    plt.savefig(folder + "/" + str(f) + "/" + str(t) + ".png")
 
                     plt.clf()
         else:
             # Create var folder
-            if not os.path.exists(self.pred_dir + "/" + str(target_var) + "/"):
-                os.makedirs(self.pred_dir + "/" + str(target_var) + "/")
+            if not os.path.exists(folder + "/" + str(target_var) + "/"):
+                os.makedirs(folder + "/" + str(target_var) + "/")
 
             f_idx = list(self.config[W.FEATURES]).index(target_var)
 
@@ -261,7 +274,7 @@ class MyModel(ABC):
                 plt.ylabel(target_var)
                 plt.grid()
                 plt.legend()
-                plt.savefig(self.pred_dir + "/" + str(target_var) + "/" + str(t) + ".png")
+                plt.savefig(folder + "/" + str(target_var) + "/" + str(t) + ".png")
 
                 plt.clf()
         plt.close()

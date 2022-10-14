@@ -24,7 +24,7 @@ os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 df, features = get_df(11)
 
 # Parameters definition
-MODEL = Models.mIAED.value
+MODEL = Models.sIAED.value
 N_FUTURE = 150
 N_PAST = 20
 N_DELAY = 0

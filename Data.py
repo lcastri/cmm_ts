@@ -3,9 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 
-
 ALL = 'all'
-
 
 class Data():
     def __init__(self,
@@ -49,9 +47,9 @@ class Data():
         self.data = pd.DataFrame(self.data.values[::step, :], columns=self.data.columns)
 
 
-    def augment(self, nrepeat = 5, sigma = 0.1):
+    def augment(self, nrepeat = 5, sigma = 0.05, scaling = 0.5):
         """
-        _summary_
+        data augmentation adding gaussian noise and scaling data
 
         Args:
             nrepeat (int, optional): Number of concatenation of the same dataset. Defaults to 5.
@@ -61,12 +59,13 @@ class Data():
         for _ in range(nrepeat):
             d = deepcopy(self.data)
             noise = np.random.normal(0, sigma, size = self.data.shape)
-            list_d.append(d + noise)
+            scaling_factor = np.random.uniform(scaling, 1)
+            rep = scaling_factor * d + noise
+            rep['g_seq'] = self.data['g_seq']
+            list_d.append(rep)
         self.data = pd.concat(list_d, ignore_index = True)
-        print()
 
-
-
+    
     def scale_data(self):
         df = self.data.astype(float)
         self.scaler = MinMaxScaler()
