@@ -24,7 +24,7 @@ os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 df, features = get_df(11)
 
 # Parameters definition
-MODEL = Models.sIAED.value
+MODEL = Models.mIAED.value
 N_FUTURE = 150
 N_PAST = 20
 N_DELAY = 0
@@ -34,15 +34,15 @@ TEST_PERC = 0.2
 MODEL_FOLDER = "PROVA"
 BATCH_SIZE = 64
 PATIENCE = 25
-EPOCH = 1
+EPOCH = 500
 TARGETVAR = 'd_g'
 
 if MODEL == Models.sIAED.value:
     if TARGETVAR == None: raise ValueError('for models sIAED, target_var needs to be specified')
     # Single-output data initialization
     d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = TARGETVAR)
-    d.augment()
-    d.downsample(10)
+    # d.augment()
+    # d.downsample(10)
     X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
     # IAED Model definition
@@ -56,8 +56,9 @@ if MODEL == Models.sIAED.value:
 elif MODEL == Models.mIAED.value:
     # Multi-output data initialization
     d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC)
-    d.augment()
+    # d.augment()
     d.downsample(10)
+    d.plot_ts()
     X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
     # IAED Model definition

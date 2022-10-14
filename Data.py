@@ -2,7 +2,10 @@ from copy import deepcopy
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
-from matplotlib import pyplot as plt 
+import matplotlib
+matplotlib.use('Qt5Agg') 
+from matplotlib import pyplot as plt
+# import tkinter
 
 ALL = 'all'
 
