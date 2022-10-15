@@ -22,11 +22,10 @@ class sIAED(MyModel):
         inp = Input(shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
         x = IAED(self.config, target_var, name = target_var + "_IAED", searchBest = searchBest)(inp)
     
-        m = Model(inp, x)
-        m.compile(loss = loss, optimizer = optimizer, metrics = metrics)
+        self.model = Model(inp, x)
+        self.model.compile(loss = loss, optimizer = optimizer, metrics = metrics)
 
-        m.summary()
-        self.model = m
+        self.model.summary()
         # plot_model(self.model, to_file = self.model_dir + '/model_plot.png', show_shapes = True, show_layer_names = True, expand_nested = True)
         return self.model
 
