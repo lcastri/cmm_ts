@@ -103,4 +103,4 @@ class sIAED(MyModel):
             np.save(file, yp_npy)
 
 
-        if plot: self.plot_prediction(x_npy, ya_npy, yp_npy, self.target_var)
+        if plot: self.plot_prediction(x_npy, ya_npy, yp_npy, target_var = self.target_var)

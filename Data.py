@@ -5,7 +5,6 @@ import numpy as np
 import matplotlib
 matplotlib.use('Qt5Agg') 
 from matplotlib import pyplot as plt
-# import tkinter
 
 ALL = 'all'
 
@@ -70,6 +69,13 @@ class Data():
             rep['g_seq'] = self.data['g_seq']
             list_d.append(rep)
         self.data = pd.concat(list_d, ignore_index = True)
+
+
+    def smooth(self, window_size):
+        for f in self.data.columns: 
+            if f != 'g_seq': self.data[f] = self.data[f].rolling(window_size).mean()
+
+        self.data.dropna(inplace=True)
 
     
     def plot_ts(self):

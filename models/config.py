@@ -16,8 +16,8 @@ config = {
     W.ATTUNITS : 256,
     W.ENCDECUNITS : 256,
     W.DECINIT : False,
-    W.D1UNITS : 256,
+    W.D1UNITS : 64,
     W.D1ACT : "relu",
-    W.D2UNITS : 128,
+    W.D2UNITS : 32,
     W.D2ACT : "relu",
 }

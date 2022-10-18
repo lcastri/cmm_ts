@@ -81,7 +81,7 @@ class MyModel(ABC):
             callbacks (list, optional): List of callbacks. Defaults to None.
         """
         history = self.model.fit(x = X, y = y, batch_size = batch_size, epochs = epochs,
-                                 callbacks = callbacks, validation_data = validation_data)
+                                 callbacks = callbacks, validation_data = validation_data, shuffle = False)
             
         with open(self.model_dir + '/history.pkl', 'wb') as file_pi:
             pickle.dump(history.history, file_pi)
@@ -247,7 +247,7 @@ class MyModel(ABC):
                 f_idx = list(self.config[W.FEATURES]).index(f)
 
                 for t in tqdm(range(len(yp)), desc = f):
-                    plt.plot(range(t, t + len(x[t][:, f_idx])), x[:, f_idx], color = 'green', label = "past")
+                    plt.plot(range(t, t + len(x[t][:, f_idx])), x[t][:, f_idx], color = 'green', label = "past")
                     plt.plot(range(t - 1 + len(x[t][:, f_idx]), t - 1 + len(x[t][:, f_idx]) + len(ya[t][:, f_idx])), ya[t][:, f_idx], color = 'blue', label = "actual")
                     plt.plot(range(t - 1 + len(x[t][:, f_idx]), t - 1 + len(x[t][:, f_idx]) + len(yp[t][:, f_idx])), yp[t][:, f_idx], color = 'red', label = "pred")
                     plt.title("Multi-step prediction - " + f)

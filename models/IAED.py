@@ -93,11 +93,11 @@ class IAED(Layer):
         else:
             dec = self.dec(repeat)
 
-        y = Dropout(0.5)(dec)
-        y = self.outdense1(y)
+        # y = Dropout(0.5)(dec)
+        y = self.outdense1(dec)
         y = Dropout(0.5)(y)
         y = self.outdense2(y)
-        y = Dropout(0.5)(y)
+        # y = Dropout(0.5)(y)
         y = self.out(y)
         y = tf.expand_dims(y, axis = -1)
 

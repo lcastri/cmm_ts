@@ -6,7 +6,6 @@ from Data import Data
 from keras.layers import *
 from keras.models import *
 from constants import *
-import pandas as pd
 
 # Models import
 from models.mIAED import mIAED
@@ -86,4 +85,4 @@ if __name__ == "__main__":
     model.RMSE(X_test, y_test, d.scaler)
 
     # Model predictions
-    model.predict(X_test, y_test, d.scaler)
+    model.predict(X_test, y_test, d.scaler, target_var = TARGETVAR)
