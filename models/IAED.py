@@ -62,7 +62,7 @@ class IAED(Layer):
 
         # Dense
         self.outdense1 = Dense(self.config[W.D1UNITS], activation = self.config[W.D1ACT], name = self.target_var + '_D1')
-        self.outdense2 = Dense(self.config[W.D2UNITS], activation = self.config[W.D2ACT], name = self.target_var + '_D2')
+        # self.outdense2 = Dense(self.config[W.D2UNITS], activation = self.config[W.D2ACT], name = self.target_var + '_D2')
         self.out = Dense(self.config[W.NFUTURE], activation = 'linear', name = self.target_var + '_DOUT')
         
 
@@ -93,10 +93,10 @@ class IAED(Layer):
         else:
             dec = self.dec(repeat)
 
-        # y = Dropout(0.5)(dec)
+        y = Dropout(0.2)(dec)
         y = self.outdense1(dec)
         y = Dropout(0.5)(y)
-        y = self.outdense2(y)
+        # y = self.outdense2(y)
         # y = Dropout(0.5)(y)
         y = self.out(y)
         y = tf.expand_dims(y, axis = -1)

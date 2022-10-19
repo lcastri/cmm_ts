@@ -26,15 +26,15 @@ df, features = get_df(11)
 # Parameters definition
 MODEL = Models.sIAED.value
 TARGETVAR = 'd_g' if MODEL == Models.sIAED.value else None 
-N_FUTURE = 150
+N_FUTURE = 75
 N_PAST = 20
 N_DELAY = 0
 TRAIN_PERC = 0.6
 VAL_PERC = 0.2
 TEST_PERC = 0.2
 MODEL_FOLDER = "PROVA"
-BATCH_SIZE = 8
-PATIENCE = 50
+BATCH_SIZE = 64
+PATIENCE = 25
 EPOCH = 500
 
 if MODEL == Models.sIAED.value:
@@ -43,6 +43,7 @@ if MODEL == Models.sIAED.value:
     d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = TARGETVAR)
     d.downsample(step = 10)
     d.smooth(window_size = 50)
+    # d.plot_ts()
     X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
     # IAED Model definition

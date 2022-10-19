@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
 import matplotlib
-matplotlib.use('Qt5Agg') 
+# matplotlib.use('Qt5Agg') 
 from matplotlib import pyplot as plt
 
 ALL = 'all'
