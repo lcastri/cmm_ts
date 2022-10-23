@@ -3,12 +3,10 @@ from keras.models import *
 from keras.utils.vis_utils import plot_model
 from models.utils import Models
 from .MyModel import MyModel
-from .IAED import IAED
+from .IAED2 import IAED
 import models.Words as W
 from tqdm import tqdm
 import numpy as np
-from math import sqrt
-from sklearn.metrics import mean_squared_error
 
 
 class sIAED(MyModel):
@@ -30,17 +28,17 @@ class sIAED(MyModel):
         return self.model
 
 
-    def RMSE(self, X, y, scaler, show = False):
+    def MAE(self, X, y, scaler, show = False):
         print('\n##')
-        print('## Prediction evaluation through RMSE')
+        print('## Prediction evaluation through MAE')
         print('##')
 
         t_idx = self.config[W.FEATURES].index(self.target_var)
         dummy_y = np.zeros(shape = (y.shape[1], 8))
         
         predY = self.model.predict(X)
-        rmse = np.zeros(shape = (1, y.shape[1]))
-        for t in tqdm(range(len(y)), desc = 'RMSE'):
+        mae = np.zeros(shape = (y.shape[1], 1))
+        for t in tqdm(range(len(y)), desc = 'Abs error'):
             
             # Invert scaling actual
             actualY_t = np.squeeze(y[t,:,:])
@@ -54,14 +52,14 @@ class sIAED(MyModel):
             predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
             predY_t = np.reshape(predY_t, (predY_t.shape[0], 1))
 
-            rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W.NFUTURE])])
-        rmse_mean = np.sum(rmse, axis=0)/len(y)
+            mae = mae + abs(actualY_t - predY_t)
+        mae_mean = mae/len(y)
 
-        with open(self.model_dir + '/rmse.npy', 'wb') as file:
-            np.save(file, rmse_mean)
+        with open(self.model_dir + '/mae.npy', 'wb') as file:
+            np.save(file, mae_mean)
 
-        self.plot_RMSE(rmse_mean, show = show)
-        return rmse_mean
+        self.plot_MAE(mae_mean, show = show)
+        return mae_mean
         
 
     def predict(self, X, y, scaler, plot = False):

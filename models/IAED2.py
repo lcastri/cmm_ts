@@ -29,13 +29,23 @@ class IAED(Layer):
             self.inatt = InputAttention(self.config, name = self.target_var + '_inatt')
            
             # Encoders
-            self.selfenc = LSTM(int(self.config[W.ENCDECUNITS]/2), 
-                                name = target_var + '_selfENC',
+            self.selfenc1 = LSTM(int(self.config[W.ENCDECUNITS]/2), 
+                                name = target_var + '_selfENC1',
+                                return_state = True,
+                                return_sequences = True,
+                                input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+            self.selfenc2 = LSTM(int(self.config[W.ENCDECUNITS]/2), 
+                                name = target_var + '_selfENC2',
                                 return_state = True,
                                 input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
 
-            self.inenc = LSTM(int(self.config[W.ENCDECUNITS]/2),
-                              name = target_var + '_inENC',
+            self.inenc1 = LSTM(int(self.config[W.ENCDECUNITS]/2),
+                              name = target_var + '_inENC1',
+                              return_state = True,
+                              return_sequences = True,
+                              input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+            self.inenc2 = LSTM(int(self.config[W.ENCDECUNITS]/2),
+                              name = target_var + '_inENC2',
                               return_state = True,
                               input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
 
@@ -50,8 +60,12 @@ class IAED(Layer):
                                                 name = self.target_var + '_pastC')
 
         else:
-            self.enc = LSTM(self.config[W.ENCDECUNITS], 
-                            name = target_var + '_ENC',
+            self.enc1 = LSTM(self.config[W.ENCDECUNITS], 
+                            name = target_var + '_ENC1',
+                            return_state = True,
+                            input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+            self.enc2 = LSTM(self.config[W.ENCDECUNITS], 
+                            name = target_var + '_ENC2',
                             return_state = True,
                             input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
 
@@ -77,12 +91,14 @@ class IAED(Layer):
             x_inatt = Dropout(self.config[W.DRATE])(x_inatt)
 
             # Encoders
-            enc1, h1, c1 = self.selfenc(x_selfatt)
-            enc2, h2, c2 = self.inenc(x_inatt)
+            enc1_1, _, _ = self.selfenc1(x_selfatt)
+            enc2_1, _, _ = self.inenc1(x_inatt)
+            enc1_2, h1, c1 = self.selfenc2(enc1_1)
+            enc2_2, h2, c2 = self.inenc2(enc2_1)
             self.past_h.assign(tf.expand_dims(h2[-1], -1))
             self.past_c.assign(tf.expand_dims(c2[-1], -1))
 
-            x = concatenate([enc1, enc2])
+            x = concatenate([enc1_2, enc2_2])
             if self.config[W.DECINIT]:
                 h = concatenate([h1, h2])
                 c = concatenate([c1, c2])

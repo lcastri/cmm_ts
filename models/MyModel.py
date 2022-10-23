@@ -89,9 +89,9 @@ class MyModel(ABC):
         self.plot_history(history)
 
 
-    def RMSE(self, X, y, scaler, folder = None, show = False):
+    def MAE(self, X, y, scaler, folder = None, show = False):
         print('\n##')
-        print('## Prediction evaluation through RMSE')
+        print('## Prediction evaluation through MAE')
         print('##')
         if folder is None: 
             folder = self.model_dir
@@ -99,20 +99,20 @@ class MyModel(ABC):
             if not os.path.exists(folder): os.makedirs(folder)
 
         if self.predY is None: self.predY = self.model.predict(X)
-        rmse = np.zeros(shape = (1, y.shape[1]))
-        for t in tqdm(range(len(y)), desc = 'RMSE'):
+        mae = np.zeros(shape = (y.shape[1], 1))
+        for t in tqdm(range(len(y)), desc = 'Abs error'):
             actualY_t = np.squeeze(y[t,:,:])
             predY_t = np.squeeze(self.predY[t,:,:])
             actualY_t = scaler.inverse_transform(actualY_t)
             predY_t = scaler.inverse_transform(predY_t)
-            rmse = rmse + np.array([sqrt(mean_squared_error(actualY_t[f], predY_t[f])) for f in range(self.config[W.NFUTURE])])
-        rmse_mean = np.sum(rmse, axis = 0)/len(y)
+            mae = mae + abs(actualY_t - predY_t)
+        mae_mean = mae/len(y)
 
-        with open(folder + '/rmse.npy', 'wb') as file:
-            np.save(file, rmse_mean)
+        with open(folder + '/mae.npy', 'wb') as file:
+            np.save(file, mae_mean)
 
-        self.plot_RMSE(rmse_mean, folder = folder, show = show)
-        return rmse
+        self.plot_MAE(mae_mean, folder = folder, show = show)
+        return mae_mean
 
 
     def predict(self, X, y, scaler, folder = None, plot = False):
@@ -212,19 +212,19 @@ class MyModel(ABC):
             plt.close()
 
 
-    def plot_RMSE(self, rmse, folder = None, show = False):
+    def plot_MAE(self, rmse, folder = None, show = False):
         plt.figure()
-        plt.title("Mean RMSE vs time steps")
+        plt.title("MAE vs time steps")
         plt.plot(range(self.config[W.NFUTURE]), rmse)
-        plt.ylabel("Mean RMSE")
+        plt.ylabel("MAE")
         plt.xlabel("Time steps")
         plt.grid()
         if show:
             plt.show()
         else:
             if folder is None: folder = self.plot_dir
-            plt.savefig(folder + "/rmse_pred.png", dpi = 300)
-            plt.savefig(folder + "/rmse_pred.eps", dpi = 300)
+            plt.savefig(folder + "/mae_pred.png", dpi = 300)
+            plt.savefig(folder + "/mae_pred.eps", dpi = 300)
         plt.close()
 
 

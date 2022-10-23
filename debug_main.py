@@ -13,29 +13,21 @@ from models.sIAED import sIAED
 from models.config import config
 os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 
-
-# # load csv and remove NaNs
-# csv_path = ROOT_DIR + "/data/training/agent_11_aug.csv"
-# df = pd.read_csv(csv_path)
-# df.fillna(method="ffill", inplace = True)
-# df.fillna(method="bfill", inplace = True)
-# features = list(df.columns)
-
 df, features = get_df(11)
 
 # Parameters definition
 MODEL = Models.sIAED.value
 TARGETVAR = 'd_g' if MODEL == Models.sIAED.value else None 
-N_FUTURE = 75
-N_PAST = 20
+N_FUTURE = 48
+N_PAST = 32
 N_DELAY = 0
-TRAIN_PERC = 0.6
-VAL_PERC = 0.2
+TRAIN_PERC = 0.7
+VAL_PERC = 0.1
 TEST_PERC = 0.2
 MODEL_FOLDER = "PROVA"
-BATCH_SIZE = 64
+BATCH_SIZE = 32
 PATIENCE = 25
-EPOCH = 500
+EPOCH = 5
 
 if MODEL == Models.sIAED.value:
     if TARGETVAR == None: raise ValueError('for models sIAED, target_var needs to be specified')
@@ -81,7 +73,7 @@ model.fit(X = X_train, y = y_train, validation_data = (X_val, y_val), batch_size
 model.save_cmatrix()
 
 # Model evaluation
-model.RMSE(X_test, y_test, d.scaler)
+model.MAE(X_test, y_test, d.scaler)
 
 # Model predictions
 model.predict(X_test, y_test, d.scaler, plot = True)
