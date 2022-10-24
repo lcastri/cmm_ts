@@ -125,7 +125,7 @@ class MyModel(ABC):
             mae = mae + abs(actualY_t - predY_t)
         mae_mean = mae/len(y)
 
-        with open(folder + '/mae.npy', 'wb') as file:
+        with open(self.model_dir + '/mae.npy', 'wb') as file:
             np.save(file, mae_mean)
 
         self.plot_MAE(mae_mean, folder = folder, show = show)

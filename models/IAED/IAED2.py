@@ -32,7 +32,6 @@ class IAED(Layer):
             # Encoders
             self.selfenc1 = LSTM(int(self.config[W.ENCDECUNITS]/2), 
                                 name = target_var + '_selfENC1',
-                                return_state = True,
                                 return_sequences = True,
                                 input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
             self.selfenc2 = LSTM(int(self.config[W.ENCDECUNITS]/2), 
@@ -42,7 +41,6 @@ class IAED(Layer):
 
             self.inenc1 = LSTM(int(self.config[W.ENCDECUNITS]/2),
                               name = target_var + '_inENC1',
-                              return_state = True,
                               return_sequences = True,
                               input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
             self.inenc2 = LSTM(int(self.config[W.ENCDECUNITS]/2),
@@ -63,7 +61,7 @@ class IAED(Layer):
         else:
             self.enc1 = LSTM(self.config[W.ENCDECUNITS], 
                             name = target_var + '_ENC1',
-                            return_state = True,
+                            return_sequences = True,
                             input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
             self.enc2 = LSTM(self.config[W.ENCDECUNITS], 
                             name = target_var + '_ENC2',
@@ -73,7 +71,8 @@ class IAED(Layer):
         self.repeat = RepeatVector(self.config[W.NFUTURE], name = self.target_var + '_REPEAT')
 
         # Decoder
-        self.dec = LSTM(self.config[W.ENCDECUNITS], name = self.target_var + '_DEC')
+        self.dec1 = LSTM(self.config[W.ENCDECUNITS], name = self.target_var + '_DEC1')
+        self.dec2 = LSTM(self.config[W.ENCDECUNITS], name = self.target_var + '_DEC2')
 
         # Dense
         self.outdense1 = Dense(self.config[W.D1UNITS], activation = self.config[W.D1ACT], name = self.target_var + '_D1')
@@ -86,14 +85,14 @@ class IAED(Layer):
         if self.config[W.USEATT]:
             # Attention
             x_selfatt = self.selfatt(x)
-            if not self.searchBest: x_selfatt = Dropout(self.config[W.DRATE])(x_selfatt)
+            # if not self.searchBest: x_selfatt = Dropout(self.config[W.DRATE])(x_selfatt)
 
             x_inatt = self.inatt([x, self.past_h, self.past_c])
-            if not self.searchBest: x_inatt = Dropout(self.config[W.DRATE])(x_inatt)
+            # if not self.searchBest: x_inatt = Dropout(self.config[W.DRATE])(x_inatt)
 
             # Encoders
-            enc1_1, _, _ = self.selfenc1(x_selfatt)
-            enc2_1, _, _ = self.inenc1(x_inatt)
+            enc1_1 = self.selfenc1(x_selfatt)
+            enc2_1 = self.inenc1(x_inatt)
             enc1_2, h1, c1 = self.selfenc2(enc1_1)
             enc2_2, h2, c2 = self.inenc2(enc2_1)
             self.past_h.assign(tf.expand_dims(h2[-1], -1))
@@ -104,23 +103,25 @@ class IAED(Layer):
                 h = concatenate([h1, h2])
                 c = concatenate([c1, c2])
         else:
-            x, h, c = self.enc(x)
+            x = self.enc1(x)
+            x, h, c = self.enc1(x)
             
         repeat = self.repeat(x)
             
         # Decoder
         if self.config[W.DECINIT]:
-            y = self.dec(repeat, initial_state = [h, c])
+            y = self.dec1(repeat, initial_state = [h, c])
         else:
-            y = self.dec(repeat)
+            y = self.dec1(repeat)
+        y = self.dec2(y)
 
-        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense1(y)
-        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense2(y)
-        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense3(y)
-        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.out(y)
         y = tf.expand_dims(y, axis = -1)
 
