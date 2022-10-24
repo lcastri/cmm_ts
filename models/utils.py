@@ -13,6 +13,7 @@ from natsort import natsorted
 class Models(Enum):
     sIAED = "sIAED"
     mIAED = "mIAED"
+    sT2V = "sT2V"
 
 
 class CausalModel(Enum):

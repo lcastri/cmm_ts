@@ -10,7 +10,9 @@ from constants import *
 # Models import
 from models.mIAED import mIAED
 from models.sIAED import sIAED
-from models.config import config
+from models.sT2VRNN import sT2VRNN
+from models.configIAED import configIAED
+from models.configT2V import configT2V
 from MyParser import *
 
 
@@ -45,10 +47,26 @@ if __name__ == "__main__":
         X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
         # IAED Model definition
-        config = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+        config = init_config(configIAED, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
         model = sIAED(config = config)
+        model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
+
+
+    elif MODEL == Models.sT2V.value:
+        if TARGETVAR == None: raise ValueError('for models sT2V, target_var needs to be specified')
+        # Single-output data initialization
+        d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = TARGETVAR)
+        d.downsample(step = 10)
+        d.smooth(window_size = 50)
+        X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
+
+        # IAED Model definition
+        config = init_config(configT2V, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+                             ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
+                             use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
+        model = sT2VRNN(config = config)
         model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
 

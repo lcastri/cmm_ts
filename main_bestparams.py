@@ -12,7 +12,7 @@ from models.utils import Words as W
 # Models import
 from models.mIAED import mIAED
 from models.sIAED import sIAED
-from models.config import config 
+from models.configIAED import config 
 
 
 df, features = get_df(11)
