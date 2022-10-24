@@ -1,6 +1,6 @@
 
 from keras.layers import *
-from models.T2V import T2V
+from models.T2V.T2V import T2V
 from constants import CM_FPCMCI
 from models.attention.SelfAttention import SelfAttention
 from models.attention.InputAttention import InputAttention

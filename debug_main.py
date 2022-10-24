@@ -7,19 +7,20 @@ from keras.layers import *
 from keras.models import *
 from constants import *
 
-# Models import
-from models.mIAED import mIAED
-from models.sIAED import sIAED
-from models.sT2VRNN import sT2VRNN
-from models.configIAED import config as cIAED
-from models.configT2V import config as cT2V
+# IAED import
+from models.IAED.mIAED import mIAED
+from models.IAED.sIAED import sIAED
+from models.IAED.config import config as cIAED
+# T2V import
+from models.T2V.sT2VRNN import sT2VRNN
+from models.T2V.config import config as cT2V
 os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 
 df, features = get_df(11)
 
 # Parameters definition
-MODEL = Models.sT2V.value
-TARGETVAR = 'd_g' if MODEL == Models.sIAED.value or MODEL == Models.sT2V.value else None 
+MODEL = Models.sIAED
+TARGETVAR = 'd_g' if MODEL == Models.sIAED or MODEL == Models.sT2V else None 
 N_FUTURE = 48
 N_PAST = 32
 N_DELAY = 0
@@ -29,9 +30,10 @@ TEST_PERC = 0.2
 MODEL_FOLDER = "PROVA9"
 BATCH_SIZE = 32
 PATIENCE = 25
-EPOCH = 500
+EPOCH = 2
 
-if MODEL == Models.sIAED.value:
+
+if MODEL == Models.sIAED:
     if TARGETVAR == None: raise ValueError('for models sIAED, target_var needs to be specified')
     # Single-output data initialization
     d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = TARGETVAR)
@@ -48,7 +50,7 @@ if MODEL == Models.sIAED.value:
     model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 
-elif MODEL == Models.sT2V.value:
+elif MODEL == Models.sT2V:
     if TARGETVAR == None: raise ValueError('for models sT2V, target_var needs to be specified')
     # Single-output data initialization
     d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = TARGETVAR)
@@ -64,7 +66,7 @@ elif MODEL == Models.sT2V.value:
     model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 
-elif MODEL == Models.mIAED.value:
+elif MODEL == Models.mIAED:
     # Multi-output data initialization
     d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC)
     # d.augment()

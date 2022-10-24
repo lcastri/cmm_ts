@@ -1,3 +1,4 @@
+from matplotlib.pyplot import yscale
 import numpy as np
 from constants import CM_FPCMCI
 from models.attention.SelfAttention import SelfAttention
@@ -71,10 +72,10 @@ class IAED(Layer):
         if self.config[W.USEATT]:
             # Attention
             x_selfatt = self.selfatt(x)
-            x_selfatt = Dropout(self.config[W.DRATE])(x_selfatt)
+            # x_selfatt = Dropout(self.config[W.DRATE])(x_selfatt)
 
             x_inatt = self.inatt([x, self.past_h, self.past_c])
-            x_inatt = Dropout(self.config[W.DRATE])(x_inatt)
+            # x_inatt = Dropout(self.config[W.DRATE])(x_inatt)
 
             # Encoders
             enc1, h1, c1 = self.selfenc(x_selfatt)
@@ -93,12 +94,12 @@ class IAED(Layer):
             
         # Decoder
         if self.config[W.DECINIT]:
-            dec = self.dec(repeat, initial_state = [h, c])
+            y = self.dec(repeat, initial_state = [h, c])
         else:
-            dec = self.dec(repeat)
+            y = self.dec(repeat)
 
-        y = Dropout(self.config[W.DRATE])(dec)
-        y = self.outdense1(dec)
+        y = Dropout(self.config[W.DRATE])(y)
+        y = self.outdense1(y)
         y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense2(y)
         y = Dropout(self.config[W.DRATE])(y)

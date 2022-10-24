@@ -8,8 +8,6 @@ from matplotlib import pyplot as plt
 import pickle
 import numpy as np
 from tqdm import tqdm
-from math import sqrt
-from sklearn.metrics import mean_squared_error
 
 
 class MyModel(ABC):
@@ -94,17 +92,36 @@ class MyModel(ABC):
         print('## Prediction evaluation through MAE')
         print('##')
         if folder is None: 
-            folder = self.model_dir
+            folder = self.plot_dir
         else:
             if not os.path.exists(folder): os.makedirs(folder)
 
         if self.predY is None: self.predY = self.model.predict(X)
         mae = np.zeros(shape = (y.shape[1], 1))
+
+        if self.name is utils.Models.sIAED or self.name is utils.Models.sT2V:
+            t_idx = self.config[W.FEATURES].index(self.target_var)
+            dummy_y = np.zeros(shape = (y.shape[1], 8))
+    
         for t in tqdm(range(len(y)), desc = 'Abs error'):
+
+            # Invert scaling actual
             actualY_t = np.squeeze(y[t,:,:])
+            if self.name is utils.Models.mIAED:
+                actualY_t = scaler.inverse_transform(actualY_t)
+            elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V:
+                dummy_y[:, t_idx] = actualY_t 
+                actualY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
+                actualY_t = np.reshape(actualY_t, (actualY_t.shape[0], 1))
+
+            # Invert scaling pred
             predY_t = np.squeeze(self.predY[t,:,:])
-            actualY_t = scaler.inverse_transform(actualY_t)
-            predY_t = scaler.inverse_transform(predY_t)
+            if self.name is utils.Models.mIAED:
+                predY_t = scaler.inverse_transform(predY_t)
+            elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V:
+                dummy_y[:, t_idx] = predY_t
+                predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
+                predY_t = np.reshape(predY_t, (predY_t.shape[0], 1))
             mae = mae + abs(actualY_t - predY_t)
         mae_mean = mae/len(y)
 
@@ -130,6 +147,11 @@ class MyModel(ABC):
 
         # Generate and save predictions
         if self.predY is None: self.predY = self.model.predict(X)
+
+        if self.name is utils.Models.sIAED or self.name is utils.Models.sT2V:
+            t_idx = self.config[W.FEATURES].index(self.target_var)
+            dummy_y = np.zeros(shape = (y.shape[1], 8))
+
         for t in range(len(self.predY)):
             # test X
             X_t = np.squeeze(X[t,:,:])
@@ -138,22 +160,30 @@ class MyModel(ABC):
 
             # test y
             Y_t = np.squeeze(y[t,:,:])
-            Y_t = scaler.inverse_transform(Y_t)
+            if self.name is utils.Models.mIAED:
+                Y_t = scaler.inverse_transform(Y_t)
+            elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V:
+                dummy_y[:, t_idx] = Y_t 
+                Y_t = scaler.inverse_transform(dummy_y)[:, t_idx]
             ya_npy.append(Y_t)
 
             # pred y
             predY_t = np.squeeze(self.predY[t,:,:])
-            predY_t = scaler.inverse_transform(predY_t)
+            if self.name is utils.Models.mIAED:
+                predY_t = scaler.inverse_transform(predY_t)
+            elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V:
+                dummy_y[:, t_idx] = predY_t
+                predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
             yp_npy.append(predY_t)
-            
-        with open(folder + '/x_npy.npy', 'wb') as file:
+        
+        with open(self.pred_dir + '/x_npy.npy', 'wb') as file:
             np.save(file, x_npy)
-        with open(folder + '/ya_npy.npy', 'wb') as file:
+        with open(self.pred_dir + '/ya_npy.npy', 'wb') as file:
             np.save(file, ya_npy)
-        with open(folder + '/yp_npy.npy', 'wb') as file:
+        with open(self.pred_dir + '/yp_npy.npy', 'wb') as file:
             np.save(file, yp_npy)
 
-        if plot: self.plot_prediction(x_npy, ya_npy, yp_npy, folder = folder)
+        if plot: self.plot_prediction(x_npy, ya_npy, yp_npy, target_var = self.target_var)
 
 
     def save_cmatrix(self):

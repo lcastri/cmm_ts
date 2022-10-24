@@ -7,12 +7,13 @@ from keras.layers import *
 from keras.models import *
 from constants import *
 
-# Models import
-from models.mIAED import mIAED
-from models.sIAED import sIAED
-from models.sT2VRNN import sT2VRNN
-from models.configIAED import configIAED
-from models.configT2V import configT2V
+# IAED import
+from models.IAED.mIAED import mIAED
+from models.IAED.sIAED import sIAED
+from models.IAED.config import config as cIAED
+# T2V import
+from models.T2V.sT2VRNN import sT2VRNN
+from models.T2V.config import config as cT2V
 from MyParser import *
 
 
@@ -38,6 +39,8 @@ if __name__ == "__main__":
     df, features = get_df(TRAIN_AGENT)
 
     use_att, use_cm, cm, cm_trainable, use_constraint, constraint = cmd_attention_map(args.att, args.catt)
+
+
     if MODEL == Models.sIAED.value:
         if TARGETVAR == None: raise ValueError('for models sIAED, target_var needs to be specified')
         # Single-output data initialization
@@ -47,7 +50,7 @@ if __name__ == "__main__":
         X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
         # IAED Model definition
-        config = init_config(configIAED, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+        config = init_config(cIAED, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
         model = sIAED(config = config)
@@ -63,7 +66,7 @@ if __name__ == "__main__":
         X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
         # IAED Model definition
-        config = init_config(configT2V, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+        config = init_config(cT2V, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
         model = sT2VRNN(config = config)
@@ -78,7 +81,7 @@ if __name__ == "__main__":
         X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
         # IAED Model definition
-        config = init_config(config, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+        config = init_config(cIAED, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
         model = mIAED(config = config)
