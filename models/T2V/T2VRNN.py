@@ -15,15 +15,16 @@ class T2VRNN(Layer):
         super(T2VRNN, self).__init__(name = name)
         self.config = config
         self.target_var = target_var
+        self.searchBest = searchBest
 
         # Causal vector definition
-        if searchBest:
+        if self.searchBest:
             causal_vec = CM_FPCMCI[0, :] if self.config[W.USECAUSAL] else None
         else:
             causal_vec = np.array(self.config[W.CMATRIX][self.config[W.FEATURES].index(self.target_var), :]) if self.config[W.USECAUSAL] else None
             
-            # Self attention
-            self.selfatt = SelfAttention(self.config, causal_vec, name = self.target_var + '_selfatt')
+        # Self attention
+        self.selfatt = SelfAttention(self.config, causal_vec, name = self.target_var + '_selfatt')
 
         # T2V
         self.t2v = T2V(config[W.T2VUNITS], name = self.target_var + '_t2v')
@@ -37,7 +38,7 @@ class T2VRNN(Layer):
         # Dense
         self.outdense1 = Dense(self.config[W.D1UNITS], activation = self.config[W.D1ACT], name = self.target_var + '_D1')
         self.outdense2 = Dense(self.config[W.D2UNITS], activation = self.config[W.D2ACT], name = self.target_var + '_D2')
-        # self.outdense3 = Dense(self.config[W.D3UNITS], activation = self.config[W.D3ACT], name = self.target_var + '_D3')
+        self.outdense3 = Dense(self.config[W.D3UNITS], activation = self.config[W.D3ACT], name = self.target_var + '_D3')
         self.out = Dense(self.config[W.NFUTURE], activation = 'linear', name = self.target_var + '_DOUT')
         
 
@@ -51,13 +52,13 @@ class T2VRNN(Layer):
         x = self.t2v(x)
         y = self.rnn(x)      
 
-        y = Dropout(self.config[W.DRATE])(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense1(y)
-        y = Dropout(self.config[W.DRATE])(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense2(y)
-        y = Dropout(self.config[W.DRATE])(y)
-        # y = self.outdense3(y)
-        # y = Dropout(self.config[W.DRATE])(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        y = self.outdense3(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.out(y)
         y = tf.expand_dims(y, axis = -1)
 

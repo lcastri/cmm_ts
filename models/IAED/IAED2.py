@@ -13,6 +13,7 @@ class IAED(Layer):
         super(IAED, self).__init__(name = name)
         self.config = config
         self.target_var = target_var
+        self.searchBest = searchBest
 
         if self.config[W.USEATT]:
 
@@ -85,10 +86,10 @@ class IAED(Layer):
         if self.config[W.USEATT]:
             # Attention
             x_selfatt = self.selfatt(x)
-            x_selfatt = Dropout(self.config[W.DRATE])(x_selfatt)
+            if not self.searchBest: x_selfatt = Dropout(self.config[W.DRATE])(x_selfatt)
 
             x_inatt = self.inatt([x, self.past_h, self.past_c])
-            x_inatt = Dropout(self.config[W.DRATE])(x_inatt)
+            if not self.searchBest: x_inatt = Dropout(self.config[W.DRATE])(x_inatt)
 
             # Encoders
             enc1_1, _, _ = self.selfenc1(x_selfatt)
@@ -109,17 +110,17 @@ class IAED(Layer):
             
         # Decoder
         if self.config[W.DECINIT]:
-            dec = self.dec(repeat, initial_state = [h, c])
+            y = self.dec(repeat, initial_state = [h, c])
         else:
-            dec = self.dec(repeat)
+            y = self.dec(repeat)
 
-        y = Dropout(self.config[W.DRATE])(dec)
-        y = self.outdense1(dec)
-        y = Dropout(self.config[W.DRATE])(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        y = self.outdense1(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense2(y)
-        y = Dropout(self.config[W.DRATE])(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense3(y)
-        y = Dropout(self.config[W.DRATE])(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.out(y)
         y = tf.expand_dims(y, axis = -1)
 

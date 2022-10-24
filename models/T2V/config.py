@@ -21,7 +21,7 @@ config = {
     W.D1ACT : "tanh",
     W.D2UNITS : 50,
     W.D2ACT : "tanh",
-    # W.D3UNITS : 16,
-    # W.D3ACT : "tanh",
+    W.D3UNITS : 16,
+    W.D3ACT : "tanh",
     W.DRATE : 0.4,
 }
