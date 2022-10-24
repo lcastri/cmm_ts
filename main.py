@@ -13,7 +13,7 @@ from models.IAED.sIAED import sIAED
 from models.IAED.config import config as cIAED
 # T2V import
 from models.T2V.sT2VRNN import sT2VRNN
-from models.T2V.config import config as cT2V
+from models.T2V.config import CONFIG as cT2V
 from MyParser import *
 
 

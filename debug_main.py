@@ -13,13 +13,13 @@ from models.IAED.sIAED import sIAED
 from models.IAED.config import config as cIAED
 # T2V import
 from models.T2V.sT2VRNN import sT2VRNN
-from models.T2V.config import config as cT2V
+from models.T2V.config import CONFIG as cT2V
 os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 
 df, features = get_df(11)
 
 # Parameters definition
-MODEL = Models.sIAED
+MODEL = Models.sT2V
 TARGETVAR = 'd_g' if MODEL == Models.sIAED or MODEL == Models.sT2V else None 
 N_FUTURE = 48
 N_PAST = 32
@@ -27,10 +27,10 @@ N_DELAY = 0
 TRAIN_PERC = 0.7
 VAL_PERC = 0.1
 TEST_PERC = 0.2
-MODEL_FOLDER = "PROVA"
+MODEL_FOLDER = "PROVA12"
 BATCH_SIZE = 32
 PATIENCE = 25
-EPOCH = 2
+EPOCH = 300
 
 
 if MODEL == Models.sIAED:

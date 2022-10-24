@@ -17,23 +17,22 @@ class T2VRNN(Layer):
         self.target_var = target_var
         self.searchBest = searchBest
 
-        # Causal vector definition
-        if self.searchBest:
-            causal_vec = CM_FPCMCI[0, :] if self.config[W.USECAUSAL] else None
-        else:
-            causal_vec = np.array(self.config[W.CMATRIX][self.config[W.FEATURES].index(self.target_var), :]) if self.config[W.USECAUSAL] else None
+        if self.config[W.USEATT]:
+            # Causal vector definition
+            if self.searchBest:
+                causal_vec = CM_FPCMCI[0, :] if self.config[W.USECAUSAL] else None
+            else:
+                causal_vec = np.array(self.config[W.CMATRIX][self.config[W.FEATURES].index(self.target_var), :]) if self.config[W.USECAUSAL] else None
             
-        # Self attention
-        self.selfatt = SelfAttention(self.config, causal_vec, name = self.target_var + '_selfatt')
+            # Self attention
+            self.selfatt = SelfAttention(self.config, causal_vec, name = self.target_var + '_selfatt')
 
         # T2V
         self.t2v = T2V(config[W.T2VUNITS], name = self.target_var + '_t2v')
 
         # RNN block
-        self.rnn = LSTM(self.config[W.ENCDECUNITS],
-                        activation = 'tanh',
-                        return_state = False,
-                        name = self.target_var + '_lstm')
+        self.rnn1 = LSTM(self.config[W.ENCDECUNITS], return_sequences = True, activation = 'tanh', name = self.target_var + '_lstm1')
+        self.rnn2 = LSTM(self.config[W.ENCDECUNITS], activation = 'tanh', name = self.target_var + '_lstm2')
 
         # Dense
         self.outdense1 = Dense(self.config[W.D1UNITS], activation = self.config[W.D1ACT], name = self.target_var + '_D1')
@@ -49,16 +48,17 @@ class T2VRNN(Layer):
             x = self.selfatt(x)
             # x = Dropout(self.config[W.DRATE])(x)
 
-        x = self.t2v(x)
-        y = self.rnn(x)      
+        y = self.t2v(x)
+        y = self.rnn1(y)      
+        y = self.rnn2(y)      
 
-        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense1(y)
-        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense2(y)
-        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense3(y)
-        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.out(y)
         y = tf.expand_dims(y, axis = -1)
 
