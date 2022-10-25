@@ -14,7 +14,9 @@ class Models(Enum):
     sIAED = "sIAED"
     mIAED = "mIAED"
     sT2V = "sT2V"
+    mT2V = "mT2V"
     sCNN = "sCNN"
+    mCNN = "mCNN"
 
 
 class CausalModel(Enum):
@@ -30,7 +32,9 @@ MODELS = {
     Models.sIAED.value : "Single-output Input Attention Encoder Decoder",
     Models.mIAED.value : "Multi-output Input Attention Encoder Decoder",
     Models.sT2V.value : "Single-output Time2Vector",
+    Models.mT2V.value : "Multi-output Time2Vector",
     Models.sCNN.value : "Single-output CNNLSTM",
+    Models.mCNN.value : "Multi-output CNNLSTM",
 }
 
 
