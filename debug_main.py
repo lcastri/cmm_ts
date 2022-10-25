@@ -14,13 +14,16 @@ from models.IAED.config import config as cIAED
 # T2V import
 from models.T2V.sT2VRNN import sT2VRNN
 from models.T2V.config import CONFIG as cT2V
+# CNN import
+from models.CNNLSTM.sCNNLSTM import sCNNLSTM
+from models.CNNLSTM.config import CONFIG as cCNN
 os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 
 df, features = get_df(11)
 
 # Parameters definition
-MODEL = Models.sT2V
-TARGETVAR = 'd_g' if MODEL == Models.sIAED or MODEL == Models.sT2V else None 
+MODEL = Models.sCNN
+TARGETVAR = 'd_g' if MODEL == Models.sIAED or MODEL == Models.sT2V or MODEL == Models.sCNN else None 
 N_FUTURE = 48
 N_PAST = 32
 N_DELAY = 0
@@ -30,7 +33,7 @@ TEST_PERC = 0.2
 MODEL_FOLDER = "PROVA12"
 BATCH_SIZE = 32
 PATIENCE = 25
-EPOCH = 300
+EPOCH = 2
 
 
 if MODEL == Models.sIAED:
@@ -58,11 +61,27 @@ elif MODEL == Models.sT2V:
     d.smooth(window_size = 50)
     X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
-    # IAED Model definition
+    # T2V Model definition
     config = init_config(cT2V, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                          ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = False,
                          use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
     model = sT2VRNN(config = config)
+    model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
+
+
+elif MODEL == Models.sCNN:
+    if TARGETVAR == None: raise ValueError('for models sCNN, target_var needs to be specified')
+    # Single-output data initialization
+    d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC, target = TARGETVAR)
+    d.downsample(step = 10)
+    d.smooth(window_size = 50)
+    X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
+
+    # CNN Model definition
+    config = init_config(cCNN, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
+                         ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = False,
+                         use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
+    model = sCNNLSTM(config = config)
     model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 

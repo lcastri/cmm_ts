@@ -3,7 +3,7 @@ from keras.layers import *
 from models.T2V.T2V import T2V
 from constants import CM_FPCMCI
 from models.attention.SelfAttention import SelfAttention
-from models.attention.InputAttention import InputAttention
+from models.DenseDropout import DenseDropout
 import numpy as np
 import tensorflow as tf
 import models.Words as W
@@ -35,10 +35,9 @@ class T2VRNN(Layer):
         self.rnn2 = LSTM(self.config[W.ENCDECUNITS], activation = 'tanh', name = self.target_var + '_lstm2')
 
         # Dense
-        self.outdense1 = Dense(self.config[W.D1UNITS], activation = self.config[W.D1ACT], name = self.target_var + '_D1')
-        self.outdense2 = Dense(self.config[W.D2UNITS], activation = self.config[W.D2ACT], name = self.target_var + '_D2')
-        self.outdense3 = Dense(self.config[W.D3UNITS], activation = self.config[W.D3ACT], name = self.target_var + '_D3')
-        self.out = Dense(self.config[W.NFUTURE], activation = 'linear', name = self.target_var + '_DOUT')
+        # self.outdense1 = DenseDropout(self.config[W.NFUTURE] * 3, self.config[W.D1ACT], self.config[W.DRATE])
+        self.outdense = DenseDropout(self.config[W.NFUTURE] * 2, self.config[W.DACT], self.config[W.DRATE])
+        self.out = DenseDropout(self.config[W.NFUTURE], 'linear', 0)
         
 
         
@@ -52,13 +51,9 @@ class T2VRNN(Layer):
         y = self.rnn1(y)      
         y = self.rnn2(y)      
 
-        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
-        y = self.outdense1(y)
         # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
-        y = self.outdense2(y)
-        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
-        y = self.outdense3(y)
-        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # y = self.outdense1(y)
+        y = self.outdense(y)
         y = self.out(y)
         y = tf.expand_dims(y, axis = -1)
 

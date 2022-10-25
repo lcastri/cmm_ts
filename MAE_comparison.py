@@ -24,10 +24,11 @@ if __name__ == "__main__":
     plt.figure()
     for m, l in zip(MODELS, LABELS):
         mae = np.load(RESULT_DIR + '/' + m + '/mae.npy')
+        mae_mean = np.mean(mae)
         if len(mae) == 1:
             print("MAE " + l + " : " + str(mae))
         else:
-            plt.plot(mae, label = l)
+            plt.plot(mae, label = l + " " + str(round(mae_mean, 3)))
     
     plt.xlabel("Time steps")
     plt.ylabel("MAE")

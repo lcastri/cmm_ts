@@ -6,7 +6,7 @@ from keras.layers import *
 from keras.models import *
 import tensorflow as tf
 import models.Words as W
-
+from models.DenseDropout import DenseDropout
 
 class IAED(Layer):
     def __init__(self, config, target_var, name = "IAED", searchBest = False):
@@ -31,22 +31,22 @@ class IAED(Layer):
            
             # Encoders
             self.selfenc1 = LSTM(int(self.config[W.ENCDECUNITS]/2), 
-                                name = target_var + '_selfENC1',
-                                return_sequences = True,
-                                input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+                                 name = target_var + '_selfENC1',
+                                 return_sequences = True,
+                                 input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
             self.selfenc2 = LSTM(int(self.config[W.ENCDECUNITS]/2), 
-                                name = target_var + '_selfENC2',
-                                return_state = True,
-                                input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+                                 name = target_var + '_selfENC2',
+                                 return_state = True,
+                                 input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
 
             self.inenc1 = LSTM(int(self.config[W.ENCDECUNITS]/2),
-                              name = target_var + '_inENC1',
-                              return_sequences = True,
-                              input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+                               name = target_var + '_inENC1',
+                               return_sequences = True,
+                               input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
             self.inenc2 = LSTM(int(self.config[W.ENCDECUNITS]/2),
-                              name = target_var + '_inENC2',
-                              return_state = True,
-                              input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+                               name = target_var + '_inENC2',
+                               return_state = True,
+                               input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
 
             # Initialization
             self.past_h = tf.Variable(tf.zeros([int(self.config[W.ENCDECUNITS]/2), 1]), 
@@ -60,25 +60,24 @@ class IAED(Layer):
 
         else:
             self.enc1 = LSTM(self.config[W.ENCDECUNITS], 
-                            name = target_var + '_ENC1',
-                            return_sequences = True,
-                            input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+                             name = target_var + '_ENC1',
+                             return_sequences = True,
+                             input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
             self.enc2 = LSTM(self.config[W.ENCDECUNITS], 
-                            name = target_var + '_ENC2',
-                            return_state = True,
-                            input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
+                             name = target_var + '_ENC2',
+                             return_state = True,
+                             input_shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
 
         self.repeat = RepeatVector(self.config[W.NFUTURE], name = self.target_var + '_REPEAT')
 
         # Decoder
-        self.dec1 = LSTM(self.config[W.ENCDECUNITS], name = self.target_var + '_DEC1')
+        self.dec1 = LSTM(self.config[W.ENCDECUNITS], return_sequences = True, name = self.target_var + '_DEC1')
         self.dec2 = LSTM(self.config[W.ENCDECUNITS], name = self.target_var + '_DEC2')
 
         # Dense
-        self.outdense1 = Dense(self.config[W.D1UNITS], activation = self.config[W.D1ACT], name = self.target_var + '_D1')
-        self.outdense2 = Dense(self.config[W.D2UNITS], activation = self.config[W.D2ACT], name = self.target_var + '_D2')
-        self.outdense3 = Dense(self.config[W.D3UNITS], activation = self.config[W.D3ACT], name = self.target_var + '_D3')
-        self.out = Dense(self.config[W.NFUTURE], activation = 'linear', name = self.target_var + '_DOUT')
+        # self.outdense1 = DenseDropout(self.config[W.NFUTURE] * 3, self.config[W.D1ACT], self.config[W.DRATE])
+        self.outdense = DenseDropout(self.config[W.NFUTURE] * 2, self.config[W.DACT], self.config[W.DRATE])
+        self.out = DenseDropout(self.config[W.NFUTURE], 'linear', 0)
         
 
     def call(self, x):
@@ -104,7 +103,7 @@ class IAED(Layer):
                 c = concatenate([c1, c2])
         else:
             x = self.enc1(x)
-            x, h, c = self.enc1(x)
+            x, h, c = self.enc2(x)
             
         repeat = self.repeat(x)
             
@@ -115,13 +114,9 @@ class IAED(Layer):
             y = self.dec1(repeat)
         y = self.dec2(y)
 
-        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
-        y = self.outdense1(y)
-        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
-        y = self.outdense2(y)
-        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
-        y = self.outdense3(y)
-        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        # y = self.outdense1(y)
+        y = self.outdense(y)
         y = self.out(y)
         y = tf.expand_dims(y, axis = -1)
 

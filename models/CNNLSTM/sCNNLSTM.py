@@ -3,11 +3,11 @@ from keras.models import *
 from keras.utils.vis_utils import plot_model
 from models.utils import Models
 from models.MyModel import MyModel
-from .IAED2 import IAED
+from .CNNLSTM import CNNLSTM
 import models.Words as W
 
 
-class sIAED(MyModel):
+class sCNNLSTM(MyModel):
     def __init__(self, config : dict = None, folder : str = None):
         super().__init__(name = Models.sIAED, config = config, folder = folder)
                
@@ -16,7 +16,7 @@ class sIAED(MyModel):
         self.target_var = target_var
 
         inp = Input(shape = (self.config[W.NPAST], self.config[W.NFEATURES]))
-        x = IAED(self.config, target_var, name = target_var + "_IAED", searchBest = searchBest)(inp)
+        x = CNNLSTM(self.config, target_var, name = target_var + "_CNNLSTM", searchBest = searchBest)(inp)
     
         self.model = Model(inp, x)
         self.model.compile(loss = loss, optimizer = optimizer, metrics = metrics)
