@@ -5,6 +5,8 @@ from keras.layers import *
 from keras.models import *
 import models.Words as W
 from models.DenseDropout import DenseDropout
+import tensorflow as tf
+
 
 class CNNLSTM(Layer):
     def __init__(self, config, target_var, name = "CNNLSTM", searchBest = False):
@@ -34,7 +36,6 @@ class CNNLSTM(Layer):
         self.out = DenseDropout(self.config[W.NFUTURE], 'linear', 0)
 
 
-
     def call(self, x):
         # Input attention
         if self.config[W.USEATT]: x = self.selfatt(x)
@@ -52,5 +53,6 @@ class CNNLSTM(Layer):
         # Dense
         y = self.outdense(y)
         y = self.out(y)
+        y = tf.expand_dims(y, axis = -1)
 
         return y
