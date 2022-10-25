@@ -28,6 +28,7 @@ CAUSAL_MODELS = {CausalModel.FPCMCI.value : CM_FPCMCI,
 MODELS = {
     Models.sIAED.value : "Single-output Input Attention Encoder Decoder",
     Models.mIAED.value : "Multi-output Input Attention Encoder Decoder",
+    Models.sT2V.value : "Single-output Time2Vector",
 }
 
 

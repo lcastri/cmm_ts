@@ -52,7 +52,7 @@ class T2VRNN(Layer):
         y = self.rnn1(y)      
         y = self.rnn2(y)      
 
-        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense1(y)
         # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.outdense2(y)

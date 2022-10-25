@@ -23,15 +23,15 @@ if __name__ == "__main__":
 
     plt.figure()
     for m, l in zip(MODELS, LABELS):
-        rmse = np.load(RESULT_DIR + '/' + m + '/rmse.npy')
-        if len(rmse) == 1:
-            print("RMSE " + l + " : " + str(rmse))
+        mae = np.load(RESULT_DIR + '/' + m + '/mae.npy')
+        if len(mae) == 1:
+            print("MAE " + l + " : " + str(mae))
         else:
-            plt.plot(rmse, label = l)
+            plt.plot(mae, label = l)
     
     plt.xlabel("Time steps")
-    plt.ylabel("RMSE")
-    if len(rmse) != 1:
+    plt.ylabel("MAE")
+    if len(mae) != 1:
         plt.legend()
         plt.grid()
         plt.savefig(RESULT_DIR + '/' + FIGNAME + ".png", dpi = 300)
