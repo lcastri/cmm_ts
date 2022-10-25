@@ -51,9 +51,13 @@ class T2VRNN(Layer):
         y = self.rnn1(y)      
         y = self.rnn2(y)      
 
+        if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        y = self.outdense1(y)
         # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
-        # y = self.outdense1(y)
-        y = self.outdense(y)
+        y = self.outdense2(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
+        y = self.outdense3(y)
+        # if not self.searchBest: y = Dropout(self.config[W.DRATE])(y)
         y = self.out(y)
         y = tf.expand_dims(y, axis = -1)
 
