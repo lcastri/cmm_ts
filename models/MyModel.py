@@ -242,11 +242,11 @@ class MyModel(ABC):
             plt.close()
 
 
-    def plot_MAE(self, rmse, folder = None, show = False):
+    def plot_MAE(self, mae, folder = None, show = False):
         plt.figure()
-        plt.title("MAE vs time steps")
-        plt.plot(range(self.config[W.NFUTURE]), rmse)
-        plt.ylabel("MAE")
+        plt.title("MAE " + str(mae.mean()))
+        plt.plot(range(self.config[W.NFUTURE]), mae)
+        plt.ylabel("Abs error")
         plt.xlabel("Time steps")
         plt.grid()
         if show:
