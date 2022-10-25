@@ -60,7 +60,7 @@ def print_init(model, targetvar, modeldir, npast, nfuture, ndelay, initdec, trai
             f.write("# contraint = " + str(constraint) + "\n")
 
     elif use_att and use_cm and not cm_trainable:
-        f.write("# Fixed causality = " + cm + "\n")
+        f.write("# Fixed causality = " + str(cm) + "\n")
     
     f.write("#" + "\n")
     f.write("# TRAINING PARAMETERS" + "\n")
