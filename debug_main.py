@@ -93,7 +93,7 @@ elif MODEL == Models.mIAED:
     # d.augment()
     d.downsample(step = 10)
     d.smooth(window_size = 50)
-    d.plot_ts()
+    # d.plot_ts()
     X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
     # IAED Model definition
@@ -110,7 +110,7 @@ elif MODEL == Models.mT2V:
     # d.augment()
     d.downsample(step = 10)
     d.smooth(window_size = 50)
-    d.plot_ts()
+    # d.plot_ts()
     X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
     # IAED Model definition
@@ -127,7 +127,7 @@ elif MODEL == Models.mCNN:
     # d.augment()
     d.downsample(step = 10)
     d.smooth(window_size = 50)
-    d.plot_ts()
+    # d.plot_ts()
     X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
 
     # IAED Model definition

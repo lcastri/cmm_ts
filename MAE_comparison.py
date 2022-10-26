@@ -28,10 +28,10 @@ if __name__ == "__main__":
         if len(mae) == 1:
             print("MAE " + l + " : " + str(mae))
         else:
-            plt.plot(mae, label = l + " " + str(round(mae_mean, 3)))
+            plt.plot(mae, label = l + " MAE: " + str(round(mae_mean, 3)))
     
-    plt.xlabel("Time steps")
-    plt.ylabel("MAE")
+    plt.xlabel("Time steps [0.1s]")
+    plt.ylabel("Abs error")
     if len(mae) != 1:
         plt.legend()
         plt.grid()
