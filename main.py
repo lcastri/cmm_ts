@@ -58,7 +58,7 @@ if __name__ == "__main__":
         config = init_config(cIAED, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
-        model = sIAED(config = config)
+        model = sIAED(df = df, config = config)
         model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
         config = init_config(cT2V, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
-        model = sT2VRNN(config = config)
+        model = sT2VRNN(df = df, config = config)
         model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
         config = init_config(cCNN, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
-        model = sCNNLSTM(config = config)
+        model = sCNNLSTM(df = df, config = config)
         model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         config = init_config(cIAED, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
-        model = mIAED(config = config)
+        model = mIAED(df = df, config = config)
         model.create_model(loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
     
@@ -120,7 +120,7 @@ if __name__ == "__main__":
         config = init_config(cT2V, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
-        model = mT2VRNN(config = config)
+        model = mT2VRNN(df = df, config = config)
         model.create_model(loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
 
 
@@ -135,7 +135,7 @@ if __name__ == "__main__":
         config = init_config(cCNN, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                              ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = INITDEC,
                              use_att = use_att, use_cm = use_cm, cm = cm, cm_trainable = cm_trainable, use_constraint = use_constraint, constraint = constraint)
-        model = mCNNLSTM(config = config)
+        model = mCNNLSTM(df = df, config = config)
         model.create_model(loss = 'mse', optimizer = Adam(LR), metrics = ['mse', 'mae', 'mape'])
         
 
