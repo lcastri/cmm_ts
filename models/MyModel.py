@@ -11,7 +11,7 @@ from tqdm import tqdm
 
 
 class MyModel(ABC):
-    def __init__(self, name, config : dict = None, folder : str = None):
+    def __init__(self, name, df, config : dict = None, folder : str = None):
         """
         Constructur, specify config if you want to create a new model, while, set folder if you want to load a pre-existing model
 
@@ -20,6 +20,7 @@ class MyModel(ABC):
             folder (str): model's name to load. Default None.
         """
         self.name = name
+        self.df = df
         self.predY = None
         if config:
             self.dir = config[W.FOLDER]
@@ -97,7 +98,12 @@ class MyModel(ABC):
             if not os.path.exists(folder): os.makedirs(folder)
 
         if self.predY is None: self.predY = self.model.predict(X)
-        mae = np.zeros(shape = (y.shape[1], 1))
+
+        if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
+            ae_shape = (y.shape[1], self.config[W.NFEATURES]) 
+        elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
+            ae_shape = (y.shape[1], 1) 
+        ae = np.zeros(shape = ae_shape)
 
         if self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
             t_idx = self.config[W.FEATURES].index(self.target_var)
@@ -122,14 +128,14 @@ class MyModel(ABC):
                 dummy_y[:, t_idx] = predY_t
                 predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
                 predY_t = np.reshape(predY_t, (predY_t.shape[0], 1))
-            mae = mae + abs(actualY_t - predY_t)
-        mae_mean = mae/len(y)
+            ae = ae + abs(actualY_t - predY_t)
+        ae_mean = ae/len(y)
 
-        with open(self.model_dir + '/mae.npy', 'wb') as file:
-            np.save(file, mae_mean)
+        with open(self.model_dir + '/ae.npy', 'wb') as file:
+            np.save(file, ae_mean)
 
-        self.plot_MAE(mae_mean, folder = folder, show = show)
-        return mae_mean
+        self.plot_MAE(ae_mean, folder = folder, show = show)
+        return ae_mean
 
 
     def predict(self, X, y, scaler, folder = None, plot = False):
@@ -243,20 +249,37 @@ class MyModel(ABC):
             plt.close()
 
 
-    def plot_MAE(self, mae, folder = None, show = False):
-        plt.figure()
-        plt.title("MAE " + str(mae.mean()))
-        plt.plot(range(self.config[W.NFUTURE]), mae)
-        plt.ylabel("Abs error")
-        plt.xlabel("Time steps")
-        plt.grid()
-        if show:
-            plt.show()
-        else:
-            if folder is None: folder = self.plot_dir
-            plt.savefig(folder + "/mae_pred.png", dpi = 300)
-            plt.savefig(folder + "/mae_pred.eps", dpi = 300)
-        plt.close()
+    def plot_MAE(self, ae, folder = None, show = False):
+        if self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V:
+            f = self.target_var
+            plt.figure()
+            plt.title(f + " NMAE " + str(round(ae.mean()/self.df[self.target_var].std(), 3)))
+            plt.plot(range(self.config[W.NFUTURE]), ae)
+            plt.ylabel("Abs error")
+            plt.xlabel("Time steps")
+            plt.grid()
+            if show:
+                plt.show()
+            else:
+                if folder is None: folder = self.plot_dir
+                plt.savefig(folder + "/" + f + "_nmae.png", dpi = 300)
+                plt.savefig(folder + "/" + f + "_nmae.eps", dpi = 300)
+            plt.close()
+        elif self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
+            for f in range(self.config[W.NFEATURES]):
+                plt.figure()
+                plt.title(self.config[W.FEATURES][f] + " NMAE " + str(round(ae[:, f].mean()/self.df[self.config[W.FEATURES][f]].std(), 3)))
+                plt.plot(range(self.config[W.NFUTURE]), ae[:, f])
+                plt.ylabel("Abs error")
+                plt.xlabel("Time steps")
+                plt.grid()
+                if show:
+                    plt.show()
+                else:
+                    if folder is None: folder = self.plot_dir
+                    plt.savefig(folder + "/" + str(self.config[W.FEATURES][f]) + "_nmae.png", dpi = 300)
+                    plt.savefig(folder + "/" + str(self.config[W.FEATURES][f]) + "_nmae.eps", dpi = 300)
+                plt.close()
 
 
     def mean_RMSE(self, rmse, folder = None):

@@ -19,12 +19,12 @@ from models.T2V.config import CONFIG as cT2V
 from models.CNNLSTM.mCNNLSTM import mCNNLSTM
 from models.CNNLSTM.sCNNLSTM import sCNNLSTM
 from models.CNNLSTM.config import CONFIG as cCNN
-os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
+# os.environ['XLA_FLAGS'] = '--xla_gpu_cuda_data_dir=/usr/lib/cuda/'
 
 df, features = get_df(11)
 
 # Parameters definition
-MODEL = Models.sCNN
+MODEL = Models.mIAED
 TARGETVAR = 'd_g' if MODEL == Models.sIAED or MODEL == Models.sT2V or MODEL == Models.sCNN else None 
 N_FUTURE = 48
 N_PAST = 32
@@ -35,7 +35,7 @@ TEST_PERC = 0.2
 MODEL_FOLDER = "PROVA12"
 BATCH_SIZE = 32
 PATIENCE = 25
-EPOCH = 2
+EPOCH = 1
 
 
 if MODEL == Models.sIAED:
@@ -51,7 +51,7 @@ if MODEL == Models.sIAED:
     config = init_config(cIAED, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                          ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = True,
                          use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
-    model = sIAED(config = config)
+    model = sIAED(df = df, config = config)
     model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 
@@ -67,7 +67,7 @@ elif MODEL == Models.sT2V:
     config = init_config(cT2V, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                          ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = False,
                          use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
-    model = sT2VRNN(config = config)
+    model = sT2VRNN(df = df, config = config)
     model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 
@@ -83,7 +83,7 @@ elif MODEL == Models.sCNN:
     config = init_config(cCNN, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                          ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = False,
                          use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
-    model = sCNNLSTM(config = config)
+    model = sCNNLSTM(df = df, config = config)
     model.create_model(target_var = TARGETVAR, loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 
@@ -100,7 +100,7 @@ elif MODEL == Models.mIAED:
     config = init_config(cIAED, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                          ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = True,
                          use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
-    model = mIAED(config = config)
+    model = mIAED(df = df, config = config)
     model.create_model(loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 
@@ -117,7 +117,7 @@ elif MODEL == Models.mT2V:
     config = init_config(cT2V, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                          ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = True,
                          use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
-    model = mT2VRNN(config = config)
+    model = mT2VRNN(df = df, config = config)
     model.create_model(loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 
@@ -134,7 +134,7 @@ elif MODEL == Models.mCNN:
     config = init_config(cCNN, folder = MODEL_FOLDER, npast = N_PAST, nfuture = N_FUTURE,
                          ndelay = N_DELAY, nfeatures = N_FEATURES, features = features, initDEC = True,
                          use_att = True, use_cm = True, cm = CM_FPCMCI, cm_trainable = True, use_constraint = True, constraint = 0.2)
-    model = mCNNLSTM(config = config)
+    model = mCNNLSTM(df = df, config = config)
     model.create_model(loss = 'mse', optimizer = Adam(0.0001), metrics = ['mse', 'mae', 'mape'])
 
 

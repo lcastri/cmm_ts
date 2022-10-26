@@ -9,8 +9,8 @@ import models.Words as W
 
 
 class mIAED(MyModel):
-    def __init__(self, config : dict = None, folder : str = None):
-        super().__init__(name = Models.mIAED, config = config, folder = folder)        
+    def __init__(self, df, config : dict = None, folder : str = None):
+        super().__init__(name = Models.mIAED, df = df, config = config, folder = folder)        
 
 
     def create_model(self, loss, optimizer, metrics, searchBest = False) -> Model:

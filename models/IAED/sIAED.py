@@ -8,8 +8,8 @@ import models.Words as W
 
 
 class sIAED(MyModel):
-    def __init__(self, config : dict = None, folder : str = None):
-        super().__init__(name = Models.sIAED, config = config, folder = folder)
+    def __init__(self, df, config : dict = None, folder : str = None):
+        super().__init__(name = Models.sIAED, df = df, config = config, folder = folder)
                
 
     def create_model(self, target_var, loss, optimizer, metrics, searchBest = False) -> Model:
