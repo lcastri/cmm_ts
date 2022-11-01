@@ -24,24 +24,23 @@ CSV file positioned inside folder "data" (to create in main folder).
 
 ## Input Specifications
 
-* **model***, [str]: network configuration to use. choices = ['sIAED', 'mIAED'];
-* **model_dir***, [str]: model folder that will be created in "training_result" folder;
-* **data***, [str]: CSV file to load positioned in "data" folder;
-* **npast***, [int]: observation window;
-* **nfuture*** [int]: forecasting window;
-* **ndelay**, [int]: forecasting delay, default = 0)
-* **noinit_dec**, [bool]: use encoder final state as initial state for decoder, default = True;
-* **att**, [bool]: use attention mechanism, default = False;
-* **catt**, [bool]: use causal-attention [CAUSAL MATRIX, TRAINABLE, CONSTRAINT], default = [None False None];
-* **target_var**, [str]: Target variable to forecast (used only if model = sIAED), default = None.<br>
-needs to be one of the columns defined in the csv file;
-* **percs**, [float float float]: train, val, test percentages, default = [0.7, 0.1, 0.2];
-* **patience**, [int]: earlystopping patience, default = 25;
-* **batch_size**, [int]: batch size, default = 128;
-* **epochs**, [int]: epochs, default = 300;
-* **learning_rate**, [float]: learning rate, default = 0.0001;
-
-\* fields are required.
+|               |           type          | required |      default      | description                                                                                                         |
+|---------------|:-----------------------:|:--------:|:-----------------:|---------------------------------------------------------------------------------------------------------------------|
+| model         |           str           |   True   |         -         | network configuration to use. choices = ['sIAED', 'mIAED']                                                          |
+| model_dir     |           str           |   True   |         -         | model folder that will be created in "training_result" folder                                                       |
+| data          |           str           |   True   |         -         | CSV file to load positioned in "data" folder                                                                        |
+| npast         |           int           |   True   |         -         | observation window                                                                                                  |
+| nfuture       |           int           |   True   |         -         | forecasting window                                                                                                  |
+| ndelay        |           int           |   False  |         0         | forecasting delay                                                                                                   |
+| noinit_dec    |           bool          |   False  |        True       | use encoder final state as initial state for decoder                                                                |
+| att           |           bool          |   False  |       False       | use attention mechanism                                                                                             |
+| catt          | [np.array, bool, float] |   False  | [None False None] | use causal-attention mechanism                                                                                      |
+| target_var    |           str           |   False  |        None       | Target variable to forecast (used only if model = sIAED). Needs to match one of the columns defined in the csv file |
+| percs         |  [float, float, float]  |   False  |   [0.7 0.1 0.2]   | needs to be one of the columns defined in the csv file                                                              |
+| patience      |           int           |   False  |         25        | earlystopping patience                                                                                              |
+| batch_size    |           int           |   False  |        128        | batch size                                                                                                          |
+| epochs        |           int           |   False  |        300        | epochs                                                                                                              |
+| learning_rate |          float          |   False  |       0.0001      | learning rate                                                                                                       |
 
 ## Example
 
