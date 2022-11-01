@@ -34,13 +34,16 @@ CSV file positioned inside folder "data" (to create in main folder).
 | ndelay        |           int           |   False  |         0         | forecasting delay                                                                                                   |
 | noinit_dec    |           bool          |   False  |        True       | use encoder final state as initial state for decoder                                                                |
 | att           |           bool          |   False  |       False       | use attention mechanism                                                                                             |
-| catt          | [str, bool, float] |   False  | [None False None] | use causal-attention mechanism                                                                                      |
+| catt          | [str, bool, float] |   False  | [None False None] | use causal-attention mechanism. Explained in detail [here](#causal-attention-mechanism).                                                                                       |
 | target_var    |           str           |   False  |        None       | Target variable to forecast (used only if model = sIAED). Needs to match one of the columns defined in the csv file |
 | percs         |  [float, float, float]  |   False  |   [0.7 0.1 0.2]   | TRAIN, VAL, TEST percentage                                                              |
 | patience      |           int           |   False  |         25        | earlystopping patience                                                                                              |
 | batch_size    |           int           |   False  |        128        | batch size                                                                                                          |
 | epochs        |           int           |   False  |        300        | epochs                                                                                                              |
 | learning_rate |          float          |   False  |       0.0001      | learning rate                                                                                                       |
+
+## Causal Attention mechanism
+
 
 ## Example
 
