@@ -158,4 +158,4 @@ if __name__ == "__main__":
     model.MAE(X_test, y_test, d.scaler)
 
     # Model predictions
-    model.predict(X_test, y_test, d.scaler, plot = True)
+    model.predict(X_test, y_test, d.scaler)
