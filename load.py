@@ -1,6 +1,6 @@
 from Data import Data
 from constants import RESULT_DIR
-from models.mIAED import mIAED
+from models.IAED.mIAED import mIAED
 from models.utils import get_df
 
 
@@ -19,14 +19,14 @@ for M in MODELS:
     for a in TEST_AGENTS:
         df, features = get_df(a)
         d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC)
-        d.augment()
-        d.downsample(10)
-        X_train, y_train, X_val, y_val, X_test, y_test = d.get_timeseries()
+        d.downsample(step = 10)
+        d.smooth(window_size = 50)
+        _, _, _, _, X_test, y_test = d.get_timeseries()
 
         # Model evaluation
         m.RMSE(X_test, y_test, d.scaler, folder = RESULT_DIR + "/" + M + '/test/' + str(a))
-        # Model predictions
-        m.predict(X_test, y_test, d.scaler, folder = RESULT_DIR + "/" + M + '/prediction/' + str(a))
+        # # Model predictions
+        # m.predict(X_test, y_test, d.scaler, folder = RESULT_DIR + "/" + M + '/prediction/' + str(a))
 
     
 
