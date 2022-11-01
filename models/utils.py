@@ -1,33 +1,10 @@
-import glob
 import os 
 import logging
 import tensorflow as tf
 import absl.logging
 from constants import *
-from enum import Enum
 import models.Words as Words
 import pandas as pd
-from natsort import natsorted
-
-
-class Models(Enum):
-    sIAED = "sIAED"
-    mIAED = "mIAED"
-
-
-class CausalModel(Enum):
-    FPCMCI = "FPCMCI"
-    PCMCI = "PCMCI"
-
-
-CAUSAL_MODELS = {CausalModel.FPCMCI.value : CM_FPCMCI,
-                 CausalModel.PCMCI.value : CM_PCMCI}
-
-
-MODELS = {
-    Models.sIAED.value : "Single-output Input Attention Encoder Decoder",
-    Models.mIAED.value : "Multi-output Input Attention Encoder Decoder",
-}
 
 
 def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, initDEC = False,
@@ -70,12 +47,19 @@ def cmd_attention_map(att, catt):
     return use_att, use_cm, cm, cm_trainable, use_constraint, constraint
 
 
-def get_df(agent):
-    # load csv and remove NaNs
-    csv_path = ROOT_DIR + "/data/" + str(agent) + "/"
+def get_df(csv):
+    """
+    load csv and remove NaNs
 
-    all_files = natsorted(glob.glob(os.path.join(csv_path, "*.csv")))
-    df = pd.concat((pd.read_csv(f) for f in all_files), ignore_index = True)
+    Args:
+        csv (str): path fo file.csv 
+
+    Returns:
+        Dataframe: loaded dataframe
+        list[str]: dataframe var names
+    """
+    csv_path = ROOT_DIR + "/data/" + str(csv)
+    df = pd.read_csv(csv_path)
 
     df.fillna(method="ffill", inplace = True)
     df.fillna(method="bfill", inplace = True)

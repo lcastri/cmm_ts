@@ -20,23 +20,23 @@ if __name__ == "__main__":
 
     MODEL = args.model
     MODEL_FOLDER = args.model_dir
-    TRAIN_AGENT = args.train_agent
+    DATA = args.data
     N_PAST = args.npast
     N_FUTURE = args.nfuture
     N_DELAY = args.ndelay
     INITDEC = args.noinit_dec
     BATCH_SIZE = args.batch_size
     TRAIN_PERC, VAL_PERC, TEST_PERC = args.percs
+    TRAIN_PERC, VAL_PERC, TEST_PERC = float(TRAIN_PERC), float(VAL_PERC), float(TEST_PERC)
     PATIENCE = args.patience
     EPOCHS = args.epochs
     LR = args.learning_rate
     ADJLR = args.adjLR
     TARGETVAR = args.target_var
 
-    df, features = get_df(TRAIN_AGENT)
+    df, features = get_df(DATA)
 
     use_att, use_cm, cm, cm_trainable, use_constraint, constraint = cmd_attention_map(args.att, args.catt)
-
 
     if MODEL == Models.sIAED.value:
         if TARGETVAR == None: raise ValueError('for models sIAED, target_var needs to be specified')
