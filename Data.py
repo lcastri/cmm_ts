@@ -2,7 +2,6 @@ from copy import deepcopy
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import numpy as np
-import matplotlib
 # matplotlib.use('Qt5Agg') 
 from matplotlib import pyplot as plt
 
@@ -18,6 +17,19 @@ class Data():
                  val_prec: float,
                  test_prec: float,
                  target: str = ALL):
+        """
+        Data constructor
+
+        Args:
+            data (pd.DataFrame): loaded dataframe
+            n_past (int): observation window size
+            n_delay (int): forecasting delay
+            n_future (int): forecasting window size
+            train_prec (float): training percentage
+            val_prec (float): validation percentage
+            test_prec (float): testing percentage
+            target (str, optional): variable to forecast. Defaults to ALL.
+        """
         
         # Data
         self.data = data
@@ -40,6 +52,15 @@ class Data():
 
 
     def get_sets(self, seq):
+        """
+        Split dataset into training, validation and testing sets
+
+        Args:
+            seq (np.array): timeseries data
+
+        Returns:
+            (np.array, np.array, np.array): training, validation and testing sets
+        """
         train_len = int(len(self.data) * self.train_perc)
         val_len = int(len(self.data) * self.val_perc)
         test_len = int(len(self.data) * self.test_perc)
@@ -57,6 +78,7 @@ class Data():
         Args:
             nrepeat (int, optional): Number of concatenation of the same dataset. Defaults to 5.
             sigma (float, optional): Gaussian noise sigma to apply to each repetition. Defaults to 0.1.
+            scaling (float, optional): Scaling factor. Default to 0.5
         """
         np.random.seed(0)
 

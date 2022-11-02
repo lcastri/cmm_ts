@@ -18,26 +18,26 @@ from models.utils import get_df
 N_FUTURE = 48
 N_PAST = 32
 N_DELAY = 0
-TRAIN_PERC = 0.0
-VAL_PERC = 0.0
-TEST_PERC = 1.0
+TRAIN_PERC = 0.5
+VAL_PERC = 0.1
+TEST_PERC = 0.4
 
 
-TEST_AGENTS = [3, 4, 5, 6, 7, 8, 9, 10]
-MODELS = ["256_mIAED_FPCMCI_t005", "256_mIAED_PCMCI_t005", "mIAED_FPCMCI_t01", "mIAED_PCMCI_t01"]
+TEST_AGENTS = [11]
+MODELS = ["256_mIAED_FPCMCI_f"]
 for M in MODELS:
     for a in TEST_AGENTS:
         df, features = get_df(a)
-        m = mT2VRNN(df = df, folder = M)
+        m = mIAED(df = df, folder = M)
         d = Data(df, N_PAST, N_DELAY, N_FUTURE, TRAIN_PERC, VAL_PERC, TEST_PERC)
         d.downsample(10)
         d.smooth(window_size = 50)
         _, _, _, _, X_test, y_test = d.get_timeseries()
 
-        # Model evaluation
-        m.MAE(X_test, y_test, d.scaler, folder = RESULT_DIR + "/" + M + '/test/' + str(a))
+        # # Model evaluation
+        # m.MAE(X_test, y_test, d.scaler, folder = RESULT_DIR + "/" + M + '/test/' + str(a))
         
-        # # Model predictions
-        # m.predict(X_test, y_test, d.scaler, folder = RESULT_DIR + "/" + M + '/prediction/' + str(a))
+        # Model predictions
+        m.predict(X_test, y_test, d.scaler, folder = RESULT_DIR + "/" + M + '/prediction/' + str(a), plot = True)
 
     
