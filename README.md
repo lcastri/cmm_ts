@@ -1,7 +1,6 @@
 # Causality-based Multi-step and Multi-output Network for Timeseries Forecasting
 
-Causality based network for multi-step and multi-output timeseries forecasting<br><br>
-
+Causality based network for multi-step and multi-output timeseries forecasting<br>
 
 <p float="left">
     <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/d_g.gif" width="24.2%" height="24.2%" />
@@ -57,8 +56,50 @@ CSV file positioned inside folder "data" (to create in main folder).
 
 ## Causal Attention mechanism
 
+Before using the **--catt** option, we need to define the causal matrix extracted from our causal model in [constants.py](https://github.com/lcastri/timeseries_forecasting/blob/main/constants.py) as follows:
 
-## Example
+Considering a system of 4 variables
+```
+causal_matrix = np.array([0.79469, 0.07976, 0, 0.20714],
+                         [0, 0.54711, 0.11897, 0],
+                         [0, 0, 0.99110, 0],
+                         [0.06849, 0.06341, 0, 0.97200])
+```
+and then, we need to create a link from a string (our input in --catt) to the causal matrix:
+```
+class CausalModel(Enum):
+    CM = "CM"
+
+CAUSAL_MODELS = {CausalModel.CM.value : causal_matrix}
+```
+Now we are ready to use the --catt option. The option needs to be followed by three inputs: <CAUSAL_MATRIX> <TRAINABLE_FLAG> <TRAIN_CONSTRAINT>. In particular:<br>
+* <CAUSAL_MATRIX> : string linked to the causal_matrix defined in constants.py script. In this case "CM"
+* <TRAINABLE_FLAG> : flag to set the causal matrix as a trainable network parameter. If False, the causal matrix will not be trained.
+* <TRAIN_CONSTRAINT> : training threshold for each value componing the causal matrix. When using the causal matrix as trainable parameter, it helps to maintain the values of the post-training causal matrix close to the pre-training one. The constraint is defined as follows:
+$$ {x - T \leq x \leq x + T} $$
+where $x$ is a value of the causal matrix and $T$ the <TRAIN_CONSTRAINT>. The constraints let the network to change the value by a certain quantity, specified by T, but not to diverge.
+
+### Examples
+
+#### Non-trainable causal matrix 
+
+```
+--catt CM False None
+```
+
+#### Trainable causal matrix (without constraint)
+
+```
+--catt CM True None
+```
+
+#### Trainable causal matrix (with constraint)
+
+```
+--catt CM True 0.1
+```
+
+## Examples
 
 ### Single-output (no attention)
 
