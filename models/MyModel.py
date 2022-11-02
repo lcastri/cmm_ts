@@ -16,6 +16,8 @@ class MyModel(ABC):
         Constructur, specify config if you want to create a new model, while, set folder if you want to load a pre-existing model
 
         Args:
+            name (str): model name
+            df (dataframe): dataset
             config (dict): configuration file. Default None.
             folder (str): model's name to load. Default None.
         """
@@ -89,6 +91,19 @@ class MyModel(ABC):
 
 
     def MAE(self, X, y, scaler, folder = None, show = False):
+        """
+        Prediction evaluation through MAE
+
+        Args:
+            X (np.array): network input
+            y (np.array): actual output
+            scaler (scaler): scaler used for the scaling
+            folder (str, optional): saving folder. Defaults to None.
+            show (bool, optional): bit to show the plots. Defaults to False.
+
+        Returns:
+            np.array: mean absolute error
+        """
         print('\n##')
         print('## Prediction evaluation through MAE')
         print('##')
@@ -139,6 +154,16 @@ class MyModel(ABC):
 
 
     def predict(self, X, y, scaler, folder = None, plot = False):
+        """
+        Predict output
+
+        Args:
+            X (np.array): network input
+            y (np.array): actual output
+            scaler (scaler): scaler used for the scaling
+            folder (str, optional): saving folder. Defaults to None.
+            plot (bool, optional): bit to plot the prediction. Defaults to False.
+        """
         print('\n##')
         print('## Predictions')
         print('##')
@@ -194,6 +219,9 @@ class MyModel(ABC):
 
 
     def save_cmatrix(self):
+        """
+        Save causal matrix after training
+        """
         if self.config[W.USECAUSAL]:
             layers = self.model.layers          
             if self.name == utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
@@ -207,7 +235,10 @@ class MyModel(ABC):
                 np.save(file_pi, ca_matrix)
 
 
-    def plot_history(self, history):       
+    def plot_history(self, history):      
+        """
+        Plot history information
+        """ 
         if "loss" in history.history.keys():
             plt.figure()
             plt.plot(history.history["loss"], label = "Training loss")
@@ -250,6 +281,14 @@ class MyModel(ABC):
 
 
     def plot_MAE(self, ae, folder = None, show = False):
+        """
+        Plot Mean Absolute Error for each variable involved in the prediction
+
+        Args:
+            ae (np.array): absolute error along horizon predition
+            folder (str, optional): saving folder. Defaults to None.
+            show (bool, optional): bit to show the plots. Defaults to False.
+        """
         if self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V:
             f = self.target_var
             plt.figure()
@@ -282,13 +321,17 @@ class MyModel(ABC):
                 plt.close()
 
 
-    def mean_RMSE(self, rmse, folder = None):
-        if folder is None: folder = self.model_dir
-        with open(folder + '/mean_rmse.npy', 'wb') as file:
-            np.save(file, np.mean(rmse))
-
-
     def plot_prediction(self, x, ya, yp, folder = None, target_var = None):
+        """
+        Plot predicted output with observed input and actual output
+
+        Args:
+            x (np.array): observation timeseries
+            ya (np.array): actual output
+            yp (np.array): predicted output
+            folder (str, optional): saving folder. Defaults to None.
+            target_var (str, optional): target var to plot. Defaults to None.
+        """
         if folder is None: folder = self.pred_dir
         plt.figure()
         if target_var is None:

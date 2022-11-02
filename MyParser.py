@@ -5,7 +5,33 @@ from models.utils import *
 
 def print_init(model, targetvar, modeldir, npast, nfuture, ndelay, initdec, train_perc, val_perc, test_perc,
                use_att, use_cm, cm, cm_trainable, use_constraint, constraint, batch_size, patience, epochs, lr, adjlr):
-    
+    """
+    Print network configuration in console and in config.pkl file
+
+    Args:
+        model (str): network configuration to use. choices = ['sIAED', 'mIAED']
+        targetvar (str): Target variable to forecast (used only if model = sIAED). Needs to match one of the columns defined in the csv file
+        modeldir (str): model folder that will be created in "training_result" folder
+        npast (int): observation window
+        nfuture (int): forecasting window
+        ndelay (int): forecasting delay
+        initdec (bool): use encoder final state as initial state for decoder
+        train_perc (float): training percentage
+        val_perc (float): validation percentage
+        test_perc (float): testion percentage
+        use_att (bool): use attention mechanism
+        use_cm (bool): use causal model
+        cm (str): string linked to the causal model
+        cm_trainable (bool): trainable causal model
+        use_constraint (bool): use constraint to train the causal model
+        constraint (float): constraint value
+        batch_size (int): batch size
+        patience (int): early stopping criteria
+        epochs (int): epochs
+        lr (float): learning rate
+        adjlr (_type_): _description_
+    """
+
     # PRINT TO CONSOLE
     print("\n#")
     print("# MODEL PARAMETERS")
@@ -74,6 +100,12 @@ def print_init(model, targetvar, modeldir, npast, nfuture, ndelay, initdec, trai
 
 
 def create_parser():
+    """
+    Create a parser
+
+    Returns:
+        ArgumentParser: parser
+    """
     model_description = "\n".join([k + " - " + MODELS[k] for k in MODELS])
 
     parser = argparse.ArgumentParser(description = 'Multivariate Multistep Timeseries forecasting framework.', formatter_class = RawTextHelpFormatter)

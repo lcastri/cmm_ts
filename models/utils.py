@@ -9,6 +9,28 @@ import pandas as pd
 
 def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, initDEC = False,
                 use_att = False, use_cm = False, cm = None, cm_trainable = False, use_constraint = False, constraint = None):
+    """
+    Init network configuration 
+
+    Args:
+        config (dict): empty network configuration
+        folder (str): model folder
+        npast (int): observation window
+        nfuture (int): forecasting window
+        ndelay (int): forecasting delay
+        nfeatures (int): number of input variables
+        features (list[str]): input variables
+        initDEC (bool, optional): use encoder final state as initial state for decoder. Defaults to False.
+        use_att (bool, optional): use attention mechanism. Defaults to False.
+        use_cm (bool, optional): use causal model. Defaults to False.
+        cm (np.array, optional): causal matrix to use. Defaults to None.
+        cm_trainable (bool, optional): causal model trainable. Defaults to False.
+        use_constraint (bool, optional): causal model constraint flag. Defaults to False.
+        constraint (float, optional): causal model constraint. Defaults to None.
+
+    Returns:
+        dict: network configuration
+    """
     config[Words.FOLDER] = folder
     config[Words.NPAST] = npast
     config[Words.NFUTURE] = nfuture
@@ -26,12 +48,22 @@ def init_config(config, folder, npast, nfuture, ndelay, nfeatures, features, ini
 
 
 def no_warning():
+    """
+    Disable warning
+    """
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' 
     tf.get_logger().setLevel(logging.ERROR)
     absl.logging.set_verbosity(absl.logging.ERROR) 
 
 
 def cmd_attention_map(att, catt):
+    """
+    Convert input from parser to boolean values
+
+    Args:
+        att (bool): --att parser option
+        catt ((str, bool, float)): --catt parser option
+    """
     def strTrue(s): return s == 'True'
     def strNone(s): return s == 'None' or s is None
 

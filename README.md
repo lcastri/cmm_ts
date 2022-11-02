@@ -83,8 +83,6 @@ Now we are ready to use the --catt option. It needs to be followed by three inpu
 
 where $x$ is a value of the causal matrix and $T$ the <TRAIN_CONSTRAINT>. The constraints let the network to change the causal value by a certain quantity, specified by T, but not to diverge. If <TRAINABLE_FLAG> is False, this field does not have effect.
 
-### Examples
-
 #### Non-trainable causal matrix 
 
 ```
