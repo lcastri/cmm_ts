@@ -81,7 +81,8 @@ Now we are ready to use the --catt option. It needs to be followed by three inpu
     <img src="https://latex.codecogs.com/svg.image?\Large&space;\color{White}{x&space;-&space;T&space;\leq&space;x&space;\leq&space;x&plus;T}" /> 
 </p>
 
-where $x$ is a value of the causal matrix and $T$ the <TRAIN_CONSTRAINT>. The constraints let the network to change the causal value by a certain quantity, specified by T, but not to diverge. If <TRAINABLE_FLAG> is False, this field does not have effect.
+where $x$ is a value of the causal matrix and $T$ the <TRAIN_CONSTRAINT>. The constraints let the network to change the causal value by a certain quantity, specified by T, but not to diverge. <br>
+**NOTE**: if <TRAINABLE_FLAG> is False, this field does not have effect.
 
 #### Non-trainable causal matrix 
 
