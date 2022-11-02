@@ -4,7 +4,7 @@ Causality based network for multi-step and multi-output timeseries forecasting<b
 
 
 <p float="left">
-    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/d_g.gif" style="width: 24.2% height: 24.2%" />
+    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/d_g.gif" width="24.2%" height="24.2%" />
     <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/v.gif" style="width: 24.2%; height: 24.2%" />
     <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/risk.gif" style="width: 24.2%; height: 24.2%" />
     <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/theta_g.gif" style="width: 24.2%; height: 24.2%" />
