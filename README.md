@@ -78,7 +78,7 @@ Now we are ready to use the --catt option. It needs to be followed by three inpu
 * <TRAIN_CONSTRAINT> : training threshold for each value componing the causal matrix. When using the causal matrix as trainable parameter, it helps to maintain the values of the post-training causal matrix close to the pre-training one. The constraint is defined as follows:
 
 <p align="center">
-    <img src="https://latex.codecogs.com/svg.image?\color{White}{x&space;-&space;T&space;\leq&space;x&space;\leq&space;x&plus;T}" /> 
+    <img src="https://latex.codecogs.com/svg.image?\Large&space;\color{White}{x&space;-&space;T&space;\leq&space;x&space;\leq&space;x&plus;T}" /> 
 </p>
 
 where $x$ is a value of the causal matrix and $T$ the <TRAIN_CONSTRAINT>. The constraints let the network to change the causal value by a certain quantity, specified by T, but not to diverge. If <TRAINABLE_FLAG> is False, this field does not have effect.
