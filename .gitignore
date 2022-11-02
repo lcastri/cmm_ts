@@ -354,7 +354,6 @@ MigrationBackup/
 *.txt
 *.png
 *.eps
-*.gif
 *.pkl
 *.json
 *.jar
@@ -364,3 +363,4 @@ MigrationBackup/
 /.vscode
 /data
 /training_result
+createGIF.py
