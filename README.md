@@ -4,15 +4,15 @@ Causality based network for multi-step and multi-output timeseries forecasting<b
 
 
 <p float="left">
-    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/d_g.gif" style="width=10.2% height=24.2%" />
-    <img src="https://drive.google.com/uc?export=view&id=1Airea-32wIkR98Ylvbh9OeF_-lfm2f_e" style="width: 24.2%; height: auto" />
-    <img src="https://drive.google.com/uc?export=view&id=19fwB4f3ZLkGtjpjKKN8wphW7sJyeYe_h" style="width: 24.2%; height: auto" />
-    <img src="https://drive.google.com/uc?export=view&id=1uUOn9tpVzN0HeZOdtdw6KlFRvqv9nXE8" style="width: 24.2%; height: auto" />
+    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/d_g.gif" style="width: 24.2% height: 24.2%" />
+    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/v.gif" style="width: 24.2%; height: 24.2%" />
+    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/risk.gif" style="width: 24.2%; height: 24.2%" />
+    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/theta_g.gif" style="width: 24.2%; height: 24.2%" />
     <br>
-    <img src="https://drive.google.com/uc?export=view&id=1prSMeKqgEvOkVij2S8eA8b16LeMbdlBV" style="width: 24.2%; height: auto" />
-    <img src="https://drive.google.com/uc?export=view&id=1qsgUep12pNIZ_ChelStLigzxa9UQJ8hK" style="width: 24.2%; height: auto" />
-    <img src="https://drive.google.com/uc?export=view&id=1zsXgfwv289cQ7C0zsdn82YCoeb0Wn-Fr" style="width: 24.2%; height: auto" />
-    <img src="https://drive.google.com/uc?export=view&id=1Or3bCWuevLQzZ_B__LEu4Y2dJ8oE9LAh" style="width: 24.2%; height: auto" />
+    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/omega.gif" style="width: 24.2%; height: 24.2%" />
+    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/theta.gif" style="width: 24.2%; height: 24.2%" />
+    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/g_seq.gif" style="width: 24.2%; height: 24.2%" />
+    <img src="https://github.com/lcastri/timeseries_forecasting/blob/main/images/d_obs.gif" style="width: 24.2%; height: 24.2%" />
 </p>
 
 
