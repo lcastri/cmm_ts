@@ -76,9 +76,11 @@ Now we are ready to use the --catt option. It needs to be followed by three inpu
 * <CAUSAL_MATRIX> : string linked to the causal_matrix defined in constants.py script. In this case "CM";
 * <TRAINABLE_FLAG> : flag to set the causal matrix as a trainable network parameter. If False, the causal matrix will not be trained;
 * <TRAIN_CONSTRAINT> : training threshold for each value componing the causal matrix. When using the causal matrix as trainable parameter, it helps to maintain the values of the post-training causal matrix close to the pre-training one. The constraint is defined as follows:
-![\Large x - T \leq x \leq x + T](https://latex.codecogs.com/svg.latex?\Large&space;{x-T \leq x \leq x+T}) 
 
-$$ {} $$
+<p align="center">
+    <img src="https://latex.codecogs.com/svg.image?x-T&space;\leq&space;x&space;\leq&space;x&plus;T" /> 
+</p>
+
 where $x$ is a value of the causal matrix and $T$ the <TRAIN_CONSTRAINT>. The constraints let the network to change the causal value by a certain quantity, specified by T, but not to diverge. If <TRAINABLE_FLAG> is False, this field does not have effect.
 
 ### Examples
