@@ -58,7 +58,7 @@ CSV file positioned inside folder "data" (to create in main folder).
 
 Before using the **--catt** option, we need to define the causal matrix extracted from our causal model in [constants.py](https://github.com/lcastri/timeseries_forecasting/blob/main/constants.py) as follows:
 
-Considering a system of 4 variables
+considering a system of 4 variables
 ```
 causal_matrix = np.array([0.79469, 0.07976, 0, 0.20714],
                          [0, 0.54711, 0.11897, 0],
@@ -72,12 +72,14 @@ class CausalModel(Enum):
 
 CAUSAL_MODELS = {CausalModel.CM.value : causal_matrix}
 ```
-Now we are ready to use the --catt option. The option needs to be followed by three inputs: <CAUSAL_MATRIX> <TRAINABLE_FLAG> <TRAIN_CONSTRAINT>. In particular:<br>
-* <CAUSAL_MATRIX> : string linked to the causal_matrix defined in constants.py script. In this case "CM"
-* <TRAINABLE_FLAG> : flag to set the causal matrix as a trainable network parameter. If False, the causal matrix will not be trained.
+Now we are ready to use the --catt option. It needs to be followed by three inputs: <CAUSAL_MATRIX> <TRAINABLE_FLAG> <TRAIN_CONSTRAINT>. In particular:<br>
+* <CAUSAL_MATRIX> : string linked to the causal_matrix defined in constants.py script. In this case "CM";
+* <TRAINABLE_FLAG> : flag to set the causal matrix as a trainable network parameter. If False, the causal matrix will not be trained;
 * <TRAIN_CONSTRAINT> : training threshold for each value componing the causal matrix. When using the causal matrix as trainable parameter, it helps to maintain the values of the post-training causal matrix close to the pre-training one. The constraint is defined as follows:
-$$ {x - T \leq x \leq x + T} $$
-where $x$ is a value of the causal matrix and $T$ the <TRAIN_CONSTRAINT>. The constraints let the network to change the value by a certain quantity, specified by T, but not to diverge.
+![\Large x - T \leq x \leq x + T](https://latex.codecogs.com/svg.latex?\Large&space;{x-T \leq x \leq x+T}) 
+
+$$ {} $$
+where $x$ is a value of the causal matrix and $T$ the <TRAIN_CONSTRAINT>. The constraints let the network to change the causal value by a certain quantity, specified by T, but not to diverge. If <TRAINABLE_FLAG> is False, this field does not have effect.
 
 ### Examples
 
