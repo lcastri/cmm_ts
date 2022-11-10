@@ -15,6 +15,26 @@ Causality based network for multi-step and multi-output timeseries forecasting<b
 </p>
 
 
+## Citation
+
+If you found this useful for your work, please cite these papers:
+```
+@article{ghidoni2022human,
+  title={From Human Perception and Action Recognition to Causal Understanding of Human-Robot Interaction in Industrial Environments},
+  author={Ghidoni, Stefano and Terreran, Matteo and Evangelista, Daniele and Menegatti, Emanuele and Eitzinger, Christian and Villagrossi, Enrico and Pedrocchi, Nicola and Castaman, Nicola and Malecha, Marcin and Mghames, Sariah and others},
+  year={2022}
+}
+```
+```
+@inproceedings{castri2022causal,
+    title={Causal Discovery of Dynamic Models for Predicting Human Spatial Interactions},
+    author={Castri, Luca and Mghames, Sariah and Hanheide, Marc and Bellotto, Nicola},
+    booktitle={International Conference on Social Robotics (ICSR)},
+    year={2022},
+}
+```
+
+
 ## Requirements
 
 * absl==0.0
