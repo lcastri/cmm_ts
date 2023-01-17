@@ -17,7 +17,7 @@ Causality based network for multi-step and multi-output timeseries forecasting<b
 
 ## Citation
 
-If you found this useful for your work, please cite these papers:
+If you found this useful for your work, please cite this paper:
 ```
 @inproceedings{castri2023fpcmci,
     title={Enhancing Causal Discovery from Robot Sensor Data in Dynamic Scenarios},
