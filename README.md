@@ -163,7 +163,7 @@ python3.8 main.py sIAED single --data data.csv --npast 32 --nfuture 48 --target_
 NOTE: in this case target_var is not specified since all the variables in the dataframe are forecasted
 
 ```
-python3.8 main.py mIAED single --data data.csv --npast 32 --nfuture 48 --batch_size 32
+python3.8 main.py mIAED multi --data data.csv --npast 32 --nfuture 48 --batch_size 32
 ```
 
 ### Multi-output (attention)
@@ -176,7 +176,7 @@ python3.8 main.py mIAED single --data data.csv --npast 32 --nfuture 48 --batch_s
 NOTE: in this case target_var is not specified since all the variables in the dataframe are forecasted
 
 ```
-python3.8 main.py mIAED single --data data.csv --npast 32 --nfuture 48 --batch_size 32 --att
+python3.8 main.py mIAED multi --data data.csv --npast 32 --nfuture 48 --batch_size 32 --att
 ```
 
 ### Multi-output (causal attention)
@@ -189,5 +189,5 @@ python3.8 main.py mIAED single --data data.csv --npast 32 --nfuture 48 --batch_s
 NOTE: in this case target_var is not specified since all the variables in the dataframe are forecasted
 
 ```
-python3.8 main.py mIAED single --data data.csv --npast 32 --nfuture 48 --batch_size 32 --catt CM False None
+python3.8 main.py mIAED multi --data data.csv --npast 32 --nfuture 48 --batch_size 32 --catt CM False None
 ```
