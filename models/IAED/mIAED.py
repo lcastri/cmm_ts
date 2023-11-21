@@ -1,6 +1,6 @@
 from keras.layers import *
 from keras.models import *
-from keras.utils.vis_utils import plot_model
+# from keras.utils. import 
 from constants import LIST_FEATURES
 from models.MyModel import MyModel
 from .IAED import IAED

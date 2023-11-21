@@ -1,6 +1,6 @@
 from keras.layers import *
 from keras.models import *
-from keras.utils.vis_utils import plot_model
+# from keras.utils.vis_utils import plot_model
 from models.utils import Models
 from models.MyModel import MyModel
 from .IAED2 import IAED

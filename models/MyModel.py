@@ -114,13 +114,16 @@ class MyModel(ABC):
 
         if self.predY is None: self.predY = self.model.predict(X)
 
-        if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
+        if self.name is utils.Models.mIAED:
+        # if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
             ae_shape = (y.shape[1], self.config[W.NFEATURES]) 
-        elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
+        elif self.name is utils.Models.sIAED:
+        # elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
             ae_shape = (y.shape[1], 1) 
         ae = np.zeros(shape = ae_shape)
 
-        if self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
+        if self.name is utils.Models.sIAED:
+        # if self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
             t_idx = self.config[W.FEATURES].index(self.target_var)
             dummy_y = np.zeros(shape = (y.shape[1], 8))
     
@@ -128,18 +131,22 @@ class MyModel(ABC):
 
             # Invert scaling actual
             actualY_t = np.squeeze(y[t,:,:])
-            if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
+            if self.name is utils.Models.mIAED:
+            # if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
                 actualY_t = scaler.inverse_transform(actualY_t)
-            elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
+            elif self.name is utils.Models.sIAED:
+            # elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
                 dummy_y[:, t_idx] = actualY_t 
                 actualY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
                 actualY_t = np.reshape(actualY_t, (actualY_t.shape[0], 1))
 
             # Invert scaling pred
             predY_t = np.squeeze(self.predY[t,:,:])
-            if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
+            if self.name is utils.Models.mIAED:
+            # if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
                 predY_t = scaler.inverse_transform(predY_t)
-            elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
+            elif self.name is utils.Models.sIAED:
+            # elif self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
                 dummy_y[:, t_idx] = predY_t
                 predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
                 predY_t = np.reshape(predY_t, (predY_t.shape[0], 1))
@@ -179,7 +186,8 @@ class MyModel(ABC):
         # Generate and save predictions
         if self.predY is None: self.predY = self.model.predict(X)
 
-        if self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
+        if self.name is utils.Models.sIAED:
+        # if self.name is utils.Models.sIAED or self.name is utils.Models.sT2V or self.name is utils.Models.sCNN:
             t_idx = self.config[W.FEATURES].index(self.target_var)
             dummy_y = np.zeros(shape = (y.shape[1], 8))
 
@@ -191,18 +199,22 @@ class MyModel(ABC):
 
             # test y
             Y_t = np.squeeze(y[t,:,:])
-            if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
+            if self.name is utils.Models.mIAED:
+            # if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
                 Y_t = scaler.inverse_transform(Y_t)
-            elif self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V:
+            elif self.name is utils.Models.sIAED:
+            # elif self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V:
                 dummy_y[:, t_idx] = Y_t 
                 Y_t = scaler.inverse_transform(dummy_y)[:, t_idx]
             ya_npy.append(Y_t)
 
             # pred y
             predY_t = np.squeeze(self.predY[t,:,:])
-            if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
+            if self.name is utils.Models.mIAED:
+            # if self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
                 predY_t = scaler.inverse_transform(predY_t)
-            elif self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V:
+            elif self.name is utils.Models.sIAED:
+            # elif self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V:
                 dummy_y[:, t_idx] = predY_t
                 predY_t = scaler.inverse_transform(dummy_y)[:, t_idx]
             yp_npy.append(predY_t)
@@ -214,7 +226,8 @@ class MyModel(ABC):
         with open(self.pred_dir + '/yp_npy.npy', 'wb') as file:
             np.save(file, yp_npy)
 
-        target = self.target_var if self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V else None
+        target = self.target_var if self.name is utils.Models.sIAED else None
+        # target = self.target_var if self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V else None
         if plot: self.plot_prediction(x_npy, ya_npy, yp_npy, target_var = target)
 
 
@@ -224,7 +237,8 @@ class MyModel(ABC):
         """
         if self.config[W.USECAUSAL]:
             layers = self.model.layers          
-            if self.name == utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
+            if self.name == utils.Models.mIAED:
+            # if self.name == utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
                 ca_matrix = [layers[l].selfatt.Dalpha.bias.numpy() for l in range(1, len(layers) - 1)]
             else:
                 ca_matrix = [layers[l].selfatt.Dalpha.bias.numpy() for l in range(1, len(layers))]
@@ -289,7 +303,8 @@ class MyModel(ABC):
             folder (str, optional): saving folder. Defaults to None.
             show (bool, optional): bit to show the plots. Defaults to False.
         """
-        if self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V:
+        # if self.name is utils.Models.sIAED or self.name == utils.Models.sCNN or self.name is utils.Models.sT2V:
+        if self.name is utils.Models.sIAED:
             f = self.target_var
             plt.figure()
             plt.title(f + " NMAE " + str(round(ae.mean()/self.df[self.target_var].std(), 3)))
@@ -304,7 +319,8 @@ class MyModel(ABC):
                 plt.savefig(folder + "/" + f + "_nmae.png", dpi = 300)
                 plt.savefig(folder + "/" + f + "_nmae.eps", dpi = 300)
             plt.close()
-        elif self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
+        elif self.name is utils.Models.mIAED:
+        # elif self.name is utils.Models.mIAED or self.name == utils.Models.mCNN or self.name == utils.Models.mT2V:
             for f in range(self.config[W.NFEATURES]):
                 plt.figure()
                 plt.title(self.config[W.FEATURES][f] + " NMAE " + str(round(ae[:, f].mean()/self.df[self.config[W.FEATURES][f]].std(), 3)))
