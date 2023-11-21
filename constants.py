@@ -6,8 +6,10 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 RESULT_DIR = ROOT_DIR + "/training_result"
 
 # Parameters definition
-N_FEATURES = 8
-LIST_FEATURES = ['d_g', 'v', 'risk', 'theta_g', 'omega', 'theta', 'g_seq', 'd_obs']
+# N_FEATURES = 8
+# LIST_FEATURES = ['d_g', 'v', 'risk', 'theta_g', 'omega', 'theta', 'g_seq', 'd_obs']
+N_FEATURES = 3
+LIST_FEATURES = ['X_0', 'X_1', 'X_2']
 
 
 # MODELS
@@ -40,11 +42,17 @@ CM_FPCMCI = np.array([[0.794693885975173,0.0797596212634794,0,0,0.20714749488419
                       [0,0,0,0,0,0,0.991103983176182,0],
                       [0,0.0684969047836938,0.0634190046412317,0,0,0,0,0.972004088748988]])
 
+CM = np.array([[0.        , 0.86774952, 0.64580477],
+               [0.        , 0.40596968, 0.        ],
+               [0.        , 0.55929937, 0.        ]])
+
 
 class CausalModel(Enum):
     FPCMCI = "FPCMCI"
     PCMCI = "PCMCI"
+    CM = "CM"
 
 CAUSAL_MODELS = {CausalModel.FPCMCI.value : CM_FPCMCI,
-                 CausalModel.PCMCI.value : CM_PCMCI}
+                 CausalModel.PCMCI.value : CM_PCMCI,
+                 CausalModel.CM.value : CM}
 

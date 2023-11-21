@@ -119,7 +119,7 @@ def create_parser():
     parser.add_argument("--att", action = 'store_true', help = "use attention bit [default False]", required = False, default = False)
     parser.add_argument("--catt", nargs = 3, help = "use causal-attention [CAUSAL MATRIX, TRAINABLE, CONSTRAINT] [default None False None]", required = False, default = [None, False, None])
     parser.add_argument("--target_var", type = str, help = "Target variable to forecast [used only if model = sIAED] [default None]", required = False, default = None)
-    parser.add_argument("--percs", nargs = 3, help = "[train, val, test percentages [default [0.7, 0.1, 0.2]]", required = False, default = [0.7, 0.1, 0.2])
+    parser.add_argument("--percs", nargs = 3, help = "[train, val, test percentages [default [0.7, 0.1, 0.2]]", required = False, default = [0.8, 0.1, 0.1])
     parser.add_argument("--patience", type = int, help = "earlystopping patience [default 25]", required = False, default = 25)
     parser.add_argument("--batch_size", type = int, help = "batch size [default 128]", required = False, default = 128)
     parser.add_argument("--epochs", type = int, help = "epochs [default 300]", required = False, default = 300)
